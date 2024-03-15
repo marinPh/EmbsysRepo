@@ -1,0 +1,112 @@
+$date
+	Thu Mar 14 15:38:25 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module proTestBench $end
+$scope module dut $end
+$var wire 1 ! busIdle $end
+$var wire 8 " ciN [7:0] $end
+$var wire 1 # clock $end
+$var wire 1 $ costumGood $end
+$var wire 1 % direction $end
+$var wire 1 & done $end
+$var wire 1 ' enable_0 $end
+$var wire 1 ( enable_1 $end
+$var wire 1 ) enable_2 $end
+$var wire 1 * enable_3 $end
+$var wire 1 + reset $end
+$var wire 1 , reset_0 $end
+$var wire 1 - reset_1 $end
+$var wire 1 . reset_2 $end
+$var wire 1 / reset_3 $end
+$var wire 1 0 stall $end
+$var wire 1 1 start $end
+$var wire 32 2 valueA [31:0] $end
+$var wire 32 3 valueB [31:0] $end
+$var wire 32 4 result [31:0] $end
+$var wire 32 5 counterValue_3 [31:0] $end
+$var wire 32 6 counterValue_2 [31:0] $end
+$var wire 32 7 counterValue_1 [31:0] $end
+$var wire 32 8 counterValue_0 [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx 8
+bx 7
+bx 6
+bx 5
+b0 4
+b0 3
+b0 2
+01
+00
+1/
+1.
+1-
+1,
+1+
+0*
+0)
+0(
+0'
+0&
+1%
+0$
+0#
+b0 "
+0!
+$end
+#5
+b0 8
+b0 7
+b0 6
+b0 5
+1#
+#10
+1&
+1$
+0,
+0-
+0.
+0/
+0#
+11
+0+
+#15
+1#
+#20
+0#
+#25
+1#
+#30
+0&
+0$
+0#
+01
+#35
+1#
+#40
+0#
+#45
+1#
+#50
+0#
+#55
+1#
+#60
+0#
+#65
+1#
+#70
+0#
+#75
+1#
+#80
+0#
