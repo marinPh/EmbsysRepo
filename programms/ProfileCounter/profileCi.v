@@ -29,11 +29,13 @@ module profileCi #(
   assign reset_3 = (valueB[11] == 1'b1) | reset;
 
   reg started;
+  always @(posedge start) begin
+    
+    started <= 1'b1;
+  end
 
-  @always (posedge clock) begin
-    if (start == 1) begin
-      started = 1;
-    end
+  always @(posedge clock) begin
+    
     if (reset == 1) begin
       started = 0;
       pot_0 = 0;
@@ -76,11 +78,6 @@ module profileCi #(
     // Define the direction of the counter
     wire direction;
     assign direction = 1'b1;
-
-    
-
-
-
   /*assign enable_0   = costumGood & (valueB[0] == 1'b1 && valueB[8] ==1'b0);
   assign enable_1   = costumGood & (valueB[1] == 1'b1 && valueB[9] ==1'b0) & stall;
   assign enable_2   = costumGood & (valueB[2] == 1'b1 && valueB[10]==1'b0) & busIdle;
@@ -89,9 +86,6 @@ module profileCi #(
   assign reset_1    = costumGood & (valueB[5] == 1'b1 && valueB[13]==1'b0) | reset;
   assign reset_2    = costumGood & (valueB[6] == 1'b1 && valueB[14]==1'b0) | reset;
   assign reset_3    = costumGood & (valueB[7] == 1'b1 && valueB[15]==1'b0) | reset;*/
-
-
-
 
   // Instantiate counters
   counter #(
@@ -133,21 +127,16 @@ module profileCi #(
       .direction(direction),
       .counterValue(counterValue_3)
   );
-
-
-
-
   // Output we use a multiplexer to select the correct counter value to assign to result
   // The counter to be selected is based on the value of valueA[1:0] and costumGood
   // if costumGood is 0, the result is 0
   // if costumGood is 1, the result is the value of the counter selected by valueA[1:0]
-  assign result = (costumGood == 1'b1) ? 
+  assign result = (ciN == customId && started == 1'b1) ? 
                     (valueA[1:0] == 2'b00) ? counterValue_0 :
                     (valueA[1:0] == 2'b01) ? counterValue_1 :
                     (valueA[1:0] == 2'b10) ? counterValue_2 :
                     (valueA[1:0] == 2'b11) ? counterValue_3 :
                     32'b0 : 32'b0;
-
 
 endmodule
 
