@@ -29,12 +29,15 @@ module profileCi #(
   assign reset_3 = (valueB[11] == 1'b1) | reset;
 
   reg started;
-  always @(posedge start) begin
+  /*always @(posedge start) begin
     
     started <= 1'b1;
-  end
+  end*/
 
   always @(posedge clock) begin
+    if (start) begin
+      started <= 1'b1;
+    end
     
     if (reset == 1) begin
       started = 0;
@@ -137,6 +140,8 @@ module profileCi #(
                     (valueA[1:0] == 2'b10) ? counterValue_2 :
                     (valueA[1:0] == 2'b11) ? counterValue_3 :
                     32'b0 : 32'b0;
+
+assign done = (ciN == customId && started == 1'b1) ? 1'b1 : 1'b0;
 
 endmodule
 

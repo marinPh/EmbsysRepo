@@ -51,25 +51,26 @@ module proTestBench;
 
     // Apply some test vectors
     // Set start signal and custom instruction ID
-    start = 1;
     #5
+    start = 1;
+    #10
     start = 0;
     valueB = 12'b000000001111;
-    #5
+    #10
     valueB = 12'b000000000000;
     stall = 1;
     busIdle = 1;
     #30
     valueA = 2'b00;
-    #5
+    #10
     valueA = 2'b01;
-    #5
+    #10
     valueA = 2'b10;
-    #5
+    #10
     valueA = 2'b11;
-    #5
+    #10
     valueA = 2'b00;
-    #5
+    #10
     ciN = 8'h00;
     #30
 
