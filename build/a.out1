@@ -1,0 +1,18 @@
+**** module/scope: counter
+     Flip-Flops   : 32
+     Logic Gates  : 385
+     ADDER[32]: 1 units
+     EQUALITY[32]: 3 units
+     MUX[2]: 64 slices
+     LPM[8]: 1 unaccounted
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
+**** TOTALS
+     Flip-Flops   : 32
+     Logic Gates  : 385
+     ADDER[32]: 1 units
+     EQUALITY[32]: 3 units
+     MUX[2]: 64 slices
+     LPM[8]: 1 unaccounted
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted

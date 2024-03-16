@@ -55,6 +55,8 @@ module or1420SingleCore ( input wire         clock12MHz,
   wire [3:0]  s_byteEnables;
   wire        s_readNotWrite, s_dataValid, s_busy;
   wire [7:0]  s_burstSize;
+
+
   
   /*
    *
@@ -326,8 +328,8 @@ module or1420SingleCore ( input wire         clock12MHz,
   wire [7:0]  s_cpu1BurstSize;
   wire        s_spm1Irq;
   
-  assign s_cpu1CiDone = s_hdmiDone | s_swapByteDone | s_flashDone | s_cpuFreqDone | s_i2cCiDone | s_delayCiDone | s_camCiDone;
-  assign s_cpu1CiResult = s_hdmiResult | s_swapByteResult | s_flashResult | s_cpuFreqResult | s_i2cCiResult | s_camCiResult | s_delayResult; 
+  assign s_cpu1CiDone = s_hdmiDone | s_swapByteDone | s_flashDone | s_cpuFreqDone | s_i2cCiDone | s_delayCiDone | s_camCiDone |s_done;
+  assign s_cpu1CiResult = s_hdmiResult | s_swapByteResult | s_flashResult | s_cpuFreqResult | s_i2cCiResult | s_camCiResult | s_delayResult|s_result; 
 
   or1420Top #( .NOP_INSTRUCTION(32'h1500FFFF)) cpu1
              (.cpuClock(s_systemClock),
@@ -628,6 +630,21 @@ module or1420SingleCore ( input wire         clock12MHz,
                       .dataValidIn(s_dataValid),
                       .addressDataIn(s_addressData[31:30]),
                       .burstSizeIn(s_burstSize));
+wire s_done;
+wire s_result;
+  profileCi #(.customId(8'd0)) profile
+            (.start(s_cpu1CiStart),
+             .clock(s_systemClock),
+             .reset(s_cpuReset),
+             .stall(cpuIsStall),
+             .busIdle(s_busIdle),
+             .valueA(s_cpu1CiDataA),
+             .valueB(s_cpu1CiDataB),
+             .ciN(s_cpu1CiN),
+             .done(s_done),
+             .result(s_result));
+
+  
  
   /*
    *

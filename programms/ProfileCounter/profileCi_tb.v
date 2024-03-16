@@ -46,17 +46,20 @@ module proTestBench;
     ciN = 8'h02;
 
     // Apply reset
+    #5
     reset = 1;
-    #10 reset = 0;
+    #10 
+    reset = 0;
 
     // Apply some test vectors
     // Set start signal and custom instruction ID
-    #5
-    start = 1;
     #10
-    start = 0;
+    start = 1;
     valueB = 12'b000000001111;
     #10
+    start = 0;
+    
+    #30
     valueB = 12'b000000000000;
     stall = 1;
     busIdle = 1;
@@ -72,7 +75,9 @@ module proTestBench;
     valueA = 2'b00;
     #10
     ciN = 8'h00;
-    #30
+    #10
+    ciN = 8'h01;
+
 
     
 
@@ -85,7 +90,7 @@ module proTestBench;
 
   initial
     begin
-      $dumpfile("counterSignals.vcd");
+      $dumpfile("ProfileSignals.vcd");
       $dumpvars(1,dut);
     end
 

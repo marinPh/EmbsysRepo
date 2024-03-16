@@ -51,3 +51,4 @@
 ../../../modules/support/verilog/sram_1024x16_dp.v
 ../../../modules/support/verilog/sram2048x8Dp.v
 ../verilog/or1420SingleCore.v
+../../programms/ProfileCounter/profileCi.v
