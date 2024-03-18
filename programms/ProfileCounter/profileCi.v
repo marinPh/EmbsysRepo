@@ -1,5 +1,5 @@
 module profileCi #(
-    parameter [7:0] customId = 8'h00
+    parameter [7:0] customId = 8'h17
 ) (
     input wire start,
     clock,
@@ -23,10 +23,10 @@ module profileCi #(
   reg pot_0, pot_1, pot_2, pot_3;
   //wire enable_0, enable_1, enable_2, enable_3;
 
-  wire reset_0 = (valueB[8] == 1'b1) | reset;
-  wire reset_1 = (valueB[9] == 1'b1) | reset;
-  wire reset_2 = (valueB[10] == 1'b1) | reset;
-  wire reset_3 = (valueB[11] == 1'b1) | reset;
+  wire reset_0 = ((ciN == customId) & (valueB[8])) | reset;
+  wire reset_1 = ((ciN == customId) & (valueB[9])) | reset;
+  wire reset_2 = ((ciN == customId) & (valueB[10])) | reset;
+  wire reset_3 = ((ciN == customId) & (valueB[11])) | reset;
 
   reg started;
   /*always @(posedge start) begin
@@ -39,16 +39,16 @@ module profileCi #(
       started = 1'b1;
     end
     
-    if (reset == 1) begin
+    if (reset == 1'b1) begin
       started = 0;
-      pot_0 = 0;
+        pot_0 = 0;
         pot_1 = 0;
         pot_2 = 0;
         pot_3 = 0;
     end
 
     //check for impulses of valueB[0-7]
-    if (started || start) begin
+    if ((ciN == customId) && (started | start)) begin
       //check if valueB[4-7]
         if (valueB[4] == 1'b1) begin
             pot_0 = 0;
@@ -85,7 +85,7 @@ module profileCi #(
   counter #(
       .WIDTH(32)
   ) counter_0 (
-    .reset(reset),
+    .reset(reset_0),
       .clock(clock),
       .enable(enable_0),
       .direction(direction),
@@ -95,7 +95,7 @@ module profileCi #(
   counter #(
       .WIDTH(32)
   ) counter_1 (
-      .reset(reset),
+      .reset(reset_1),
       .clock(clock),
       .enable(enable_1),
       .direction(direction),
@@ -105,7 +105,7 @@ module profileCi #(
   counter #(
       .WIDTH(32)
   ) counter_2 (
-      .reset(reset),
+      .reset(reset_2),
       .clock(clock),
       .enable(enable_2),
       .direction(direction),
@@ -115,7 +115,7 @@ module profileCi #(
   counter #(
       .WIDTH(32)
   ) counter_3 (
-      .reset(reset),
+      .reset(reset_3),
       .clock(clock),
       .enable(enable_3),
       .direction(direction),
@@ -130,7 +130,7 @@ module profileCi #(
                     (valueA[1:0] == 2'b01) ? counterValue_1 :
                     (valueA[1:0] == 2'b10) ? counterValue_2 :
                     (valueA[1:0] == 2'b11) ? counterValue_3 :
-                    32'b0 : 32'b0;
+                    32'h0 : 32'h0;
 
 assign done = (ciN == customId && started == 1'b1) ? 1'b1 : 1'b0;
 
