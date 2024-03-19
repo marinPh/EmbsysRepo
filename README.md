@@ -1,3 +1,30 @@
+Part 1 of PW2
+The counter is defined in
+    programms/ProfileCounter/counter.v
+
+The implementation of the profiling instructions is:
+    programms/ProfileCounter/profileCi.v
+
+The testbenches are in the same directory.
+
+In programms/grayscale/src/grayscale.c we modified the source code and added a couple of inline assembly instructions (lines 33, 36, 59 etc.) resembling the ones from the course.
+
+The "top module" of the assignment was instantiated in systems/singleCore/or1420SingleCore.v at line 636. A wire was defined at line 50 and connected to the "or1420Top" module to pass stalled cpu signal to the profileCi module, but it seems to stall the running script instead of telling us if the CPU is stalled.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=========================OLD README BELOW=============================
 #### Structure:
 
 The virtual prototype consists of three directories:

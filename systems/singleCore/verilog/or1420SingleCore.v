@@ -47,7 +47,7 @@ module or1420SingleCore ( input wire         clock12MHz,
                            );
 
   wire        s_busIdle, s_snoopableBurst;
-  wire        s_hdmiDone, s_systemClock, s_systemClockX2, s_swapByteDone, s_flashDone, s_cpuFreqDone;
+  wire        s_hdmiDone, s_systemClock, s_systemClockX2, s_swapByteDone, s_flashDone, s_cpuFreqDone, sdd_stalled;
   wire [31:0] s_hdmiResult, s_swapByteResult, s_flashResult, s_cpuFreqResult;
   wire [5:0]  s_memoryDistance = 6'd0;
   wire        s_busError, s_beginTransaction, s_endTransaction;
@@ -335,7 +335,7 @@ module or1420SingleCore ( input wire         clock12MHz,
              (.cpuClock(s_systemClock),
               .cpuReset(s_cpuReset),
               .irq(1'b0),
-              .cpuIsStalled(),
+              .cpuIsStalled(sdd_stalled),
               .iCacheReqBus(s_cpu1IcacheRequestBus),
               .dCacheReqBus(s_cpu1DcacheRequestBus),
               .iCacheBusGrant(s_cpu1IcacheBusAccessGranted),
@@ -636,7 +636,7 @@ profileCi #(.customId(8'h17)) profile
             (.start(s_cpu1CiStart),
              .clock(s_systemClock),
              .reset(s_cpuReset),
-             .stall(cpuIsStall),
+             .stall(1'b0),
              .busIdle(s_busIdle),
              .valueA(s_cpu1CiDataA),
              .valueB(s_cpu1CiDataB),
