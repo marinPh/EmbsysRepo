@@ -27,22 +27,10 @@ int main () {
   uint32_t grayPixels;
   vga[2] = swap_u32(2);
   vga[3] = swap_u32((uint32_t) &grayscale[0]);
-
-  //reset counters
-  uint32_t control = (0xF << 8);
-  asm volatile ("l.nios_rrr r0,r0,%[in2],0x17"::[in2]"r"(control));
-  //enable counters
-  control = 7;
-  asm volatile ("l.nios_rrr r0,r0,%[in2],0x17"::[in2]"r"(control));
-
-  while(1)
-  {
-    //reset counters
-    control = (7 << 8);
-    asm volatile ("l.nios_rrr r0,r0,%[in2],0x17"::[in2]"r"(control));
-
+  while(1) {
     uint32_t * gray = (uint32_t *) &grayscale[0];
     takeSingleImageBlocking((uint32_t) &rgb565[0]);
+    asm volatile ("l.nios_rrr r0,r0,%[in2],0xC"::[in2]"r"(7));
     for (int line = 0; line < camParams.nrOfLinesPerImage; line++) {
       for (int pixel = 0; pixel < camParams.nrOfPixelsPerLine; pixel++) {
         uint16_t rgb = swap_u16(rgb565[line*camParams.nrOfPixelsPerLine+pixel]);
@@ -53,13 +41,9 @@ int main () {
         grayscale[line*camParams.nrOfPixelsPerLine+pixel] = gray;
       }
     }
-
-    //read counter1
-    uint32_t cc = 0, stall = 0, idle = 0;
-    asm volatile ("l.nios_rrr %[out1],%[in1],r0,0x17":[out1]"=r"(cc):[in1]"r"(0));
-    asm volatile ("l.nios_rrr %[out1],%[in1],r0,0x17":[out1]"=r"(stall):[in1]"r"(1));
-    asm volatile ("l.nios_rrr %[out1],%[in1],r0,0x17":[out1]"=r"(idle):[in1]"r"(2));
-
-    printf("Frame conversion took %lu CPU cycles, %lu stalled and %lu was IDLE\n", cc, stall, idle);
+    asm volatile ("l.nios_rrr %[out1],r0,%[in2],0xC":[out1]"=r"(cycles):[in2]"r"(1<<8|7<<4));
+    asm volatile ("l.nios_rrr %[out1],%[in1],%[in2],0xC":[out1]"=r"(stall):[in1]"r"(1),[in2]"r"(1<<9));
+    asm volatile ("l.nios_rrr %[out1],%[in1],%[in2],0xC":[out1]"=r"(idle):[in1]"r"(2),[in2]"r"(1<<10));
+    printf("nrOfCycles: %d %d %d\n", cycles, stall, idle);
   }
 }

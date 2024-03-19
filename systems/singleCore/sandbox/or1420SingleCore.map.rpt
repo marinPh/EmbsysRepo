@@ -1,5 +1,5 @@
 Analysis & Synthesis report for or1420SingleCore
-Mon Mar 18 23:58:53 2024
+Tue Mar 19 02:39:31 2024
 Quartus Prime Version 23.1std.0 Build 991 11/28/2023 SC Lite Edition
 
 
@@ -96,22 +96,23 @@ Quartus Prime Version 23.1std.0 Build 991 11/28/2023 SC Lite Edition
  88. altpll Parameter Settings by Entity Instance
  89. altsyncram Parameter Settings by Entity Instance
  90. lpm_mult Parameter Settings by Entity Instance
- 91. Port Connectivity Checks: "busArbiter:arbiter"
- 92. Port Connectivity Checks: "screens:hdmi|dualPortRam4k:asciiRam2"
- 93. Port Connectivity Checks: "screens:hdmi|dualPortRam4k:asciiRam1"
- 94. Port Connectivity Checks: "screens:hdmi|textController:textC2"
- 95. Port Connectivity Checks: "screens:hdmi"
- 96. Port Connectivity Checks: "swapByte:ise1"
- 97. Port Connectivity Checks: "processorId:cpuFreq|decimalCounter:cnt[5].dcount"
- 98. Port Connectivity Checks: "processorId:cpuFreq|decimalCounter:cnt[0].dcount"
- 99. Port Connectivity Checks: "or1420Top:cpu1"
-100. Port Connectivity Checks: "sdramController:sdram|sdramFifo:buffer|sram512X32Dp:readMem"
-101. Port Connectivity Checks: "sdramController:sdram"
-102. Port Connectivity Checks: "uartBus:uart1"
-103. Post-Synthesis Netlist Statistics for Top Partition
-104. Elapsed Time Per Partition
-105. Analysis & Synthesis Messages
-106. Analysis & Synthesis Suppressed Messages
+ 91. Port Connectivity Checks: "profileCi:profile"
+ 92. Port Connectivity Checks: "busArbiter:arbiter"
+ 93. Port Connectivity Checks: "screens:hdmi|dualPortRam4k:asciiRam2"
+ 94. Port Connectivity Checks: "screens:hdmi|dualPortRam4k:asciiRam1"
+ 95. Port Connectivity Checks: "screens:hdmi|textController:textC2"
+ 96. Port Connectivity Checks: "screens:hdmi"
+ 97. Port Connectivity Checks: "swapByte:ise1"
+ 98. Port Connectivity Checks: "processorId:cpuFreq|decimalCounter:cnt[5].dcount"
+ 99. Port Connectivity Checks: "processorId:cpuFreq|decimalCounter:cnt[0].dcount"
+100. Port Connectivity Checks: "or1420Top:cpu1"
+101. Port Connectivity Checks: "sdramController:sdram|sdramFifo:buffer|sram512X32Dp:readMem"
+102. Port Connectivity Checks: "sdramController:sdram"
+103. Port Connectivity Checks: "uartBus:uart1"
+104. Post-Synthesis Netlist Statistics for Top Partition
+105. Elapsed Time Per Partition
+106. Analysis & Synthesis Messages
+107. Analysis & Synthesis Suppressed Messages
 
 
 
@@ -138,7 +139,7 @@ https://fpgasoftware.intel.com/eula.
 +-------------------------------------------------------------------------------------+
 ; Analysis & Synthesis Summary                                                        ;
 +------------------------------------+------------------------------------------------+
-; Analysis & Synthesis Status        ; Successful - Mon Mar 18 23:58:52 2024          ;
+; Analysis & Synthesis Status        ; Successful - Tue Mar 19 02:39:30 2024          ;
 ; Quartus Prime Version              ; 23.1std.0 Build 991 11/28/2023 SC Lite Edition ;
 ; Revision Name                      ; or1420SingleCore                               ;
 ; Top-level Entity Name              ; or1420SingleCore                               ;
@@ -3566,6 +3567,15 @@ Note: In order to hide this table in the UI and the text report file, please set
 +---------------------------------------+---------------------------------------------------------------+
 
 
++-----------------------------------------------+
+; Port Connectivity Checks: "profileCi:profile" ;
++-------+-------+----------+--------------------+
+; Port  ; Type  ; Severity ; Details            ;
++-------+-------+----------+--------------------+
+; stall ; Input ; Info     ; Stuck at GND       ;
++-------+-------+----------+--------------------+
+
+
 +------------------------------------------------------------------------------------------------------------------------------+
 ; Port Connectivity Checks: "busArbiter:arbiter"                                                                               ;
 +--------------------+--------+----------+-------------------------------------------------------------------------------------+
@@ -3655,7 +3665,7 @@ Note: In order to hide this table in the UI and the text report file, please set
 ; Port         ; Type   ; Severity ; Details                                                                             ;
 +--------------+--------+----------+-------------------------------------------------------------------------------------+
 ; irq          ; Input  ; Info     ; Stuck at GND                                                                        ;
-; cpuIsStalled ; Output ; Info     ; Explicitly unconnected                                                              ;
+; cpuIsStalled ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
 ; ciReadRa     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
 ; ciReadRb     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
 ; ciWriteRd    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
@@ -3761,7 +3771,7 @@ Info: Running Quartus Prime Analysis & Synthesis
     Info: Intel and sold by Intel or its authorized distributors.  Please
     Info: refer to the applicable agreement for further details, at
     Info: https://fpgasoftware.intel.com/eula.
-    Info: Processing started: Mon Mar 18 23:58:12 2024
+    Info: Processing started: Tue Mar 19 02:38:50 2024
 Info: Command: quartus_map --family="Cyclone IV E" or1420SingleCore
 Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
 Info (20030): Parallel compilation is enabled and will use 4 of the 4 processors detected
@@ -3875,7 +3885,6 @@ Info (12021): Found 1 design units, including 1 entities, in source file /d/ED/v
     Info (12023): Found entity 1: profileCi File: /d/ED/virtual_prototype/programms/ProfileCounter/profileCi.v Line: 1
 Info (12021): Found 1 design units, including 1 entities, in source file /d/ED/virtual_prototype/programms/ProfileCounter/counter.v
     Info (12023): Found entity 1: counter File: /d/ED/virtual_prototype/programms/ProfileCounter/counter.v Line: 1
-Warning (10236): Verilog HDL Implicit Net warning at or1420SingleCore.v(639): created implicit net for "cpuIsStall" File: /d/ED/virtual_prototype/systems/singleCore/verilog/or1420SingleCore.v Line: 639
 Info (12127): Elaborating entity "or1420SingleCore" for the top level hierarchy
 Warning (10230): Verilog HDL assignment warning at or1420SingleCore.v(613): truncated value with size 29 to match size of target (28) File: /d/ED/virtual_prototype/systems/singleCore/verilog/or1420SingleCore.v Line: 613
 Info (12128): Elaborating entity "altpll" for hierarchy "altpll:altpll_component" File: /d/ED/virtual_prototype/systems/singleCore/verilog/or1420SingleCore.v Line: 175
@@ -4483,9 +4492,9 @@ Info (21057): Implemented 15087 device resources after synthesis - the final res
     Info (21064): Implemented 242 RAM segments
     Info (21065): Implemented 1 PLLs
     Info (21062): Implemented 9 DSP elements
-Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 21 warnings
-    Info: Peak virtual memory: 519 megabytes
-    Info: Processing ended: Mon Mar 18 23:58:53 2024
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 20 warnings
+    Info: Peak virtual memory: 534 megabytes
+    Info: Processing ended: Tue Mar 19 02:39:31 2024
     Info: Elapsed time: 00:00:41
     Info: Total CPU time (on all processors): 00:00:54
 
