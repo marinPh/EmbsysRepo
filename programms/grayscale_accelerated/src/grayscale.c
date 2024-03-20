@@ -37,10 +37,11 @@ int main () {
         //uint32_t red1 = ((rgb >> 11) & 0x1F) << 3;
         //uint32_t green1 = ((rgb >> 5) & 0x3F) << 2;
         //uint32_t blue1 = (rgb & 0x1F) << 3;
-        //uint32_t gray = ((red1*54+green1*183+blue1*19) >> 8)&0xFF;
-        uint32_t gray = 0x3f3f;
+        //uint32_t gray_soft = ((red1*54+green1*183+blue1*19) >> 8)&0xFF;
+        uint32_t gray = 128;
         asm volatile ("l.nios_rrr %[out1],%[in1],r0,0xD":[out1]"=r"(gray):[in1]"r"(rgb));
         grayscale[line*camParams.nrOfPixelsPerLine+pixel] = gray;
+        //printf("R = %d, G = %d, B = %d, packed rgb = %d, GR = %d, should be %d ", red1, green1, blue1, rgb, gray, gray_soft);
       }
     }
     asm volatile ("l.nios_rrr %[out1],r0,%[in2],0xC":[out1]"=r"(cycles):[in2]"r"(1<<8|7<<4));
