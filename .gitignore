@@ -26,4 +26,15 @@
 *.hb_info
 *.sig
 *.kpt
-
+*.dpi
+*.db_info
+*.ddb
+*.tdb
+*.rdb
+*.qmsg
+*.8_slow
+*.hif
+*.hier_info
+*.idb
+*.bpm
+*.tdf
