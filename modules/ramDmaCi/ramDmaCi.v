@@ -1,13 +1,13 @@
-module ramDmaCi #
-(parameter[7:0] customId = 8'h00)
-(input wire start,
-clock,
-reset,
-input wire [31:0] valueA,
- valueB,
- input wire [ 7 : 0 ] ciN,
- output wire [31:0] result,
- output wire done);
+
+module ramDmaCi #(parameter[7:0] customId = 8'h00)
+                (input wire start,
+                            clock,
+                            reset,
+                input wire [31:0] valueA,
+                                    valueB,
+                input wire [ 7 : 0 ] ciN,
+                output wire [31:0] result,
+                output wire done);
 
  // declare an array of 32 bit words of depth 512
 
@@ -64,6 +64,8 @@ begin
     end
   
 end
+
+endmodule
 
 
 
