@@ -3,7 +3,6 @@
 #include <swap.h>
 #include <vga.h>
 
-#define __WITH_CI
 
 int main () {
   volatile uint16_t rgb565[640*480];
@@ -24,23 +23,14 @@ int main () {
   vga[1] = swap_u32(result);
   printf("PCLK (kHz) : %d\n", camParams.pixelClockInkHz );
   printf("FPS        : %d\n", camParams.framesPerSecond );
+  uint32_t * rgb = (uint32_t *) &rgb565[0];
   uint32_t grayPixels;
   vga[2] = swap_u32(2);
   vga[3] = swap_u32((uint32_t) &grayscale[0]);
   while(1) {
+    uint32_t * gray = (uint32_t *) &grayscale[0];
     takeSingleImageBlocking((uint32_t) &rgb565[0]);
     asm volatile ("l.nios_rrr r0,r0,%[in2],0xC"::[in2]"r"(7));
-#ifdef __WITH_CI
-      uint32_t * rgb = (uint32_t *) &rgb565[0];
-      uint32_t * gray = (uint32_t *) &grayscale[0];
-      for (int pixel = 0; pixel < ((camParams.nrOfLinesPerImage*camParams.nrOfPixelsPerLine) >> 1); pixel +=2) {
-        uint32_t pixel1 = rgb[pixel];
-        uint32_t pixel2 = rgb[pixel+1];
-        asm volatile ("l.nios_rrr %[out1],%[in1],%[in2],0x9":[out1]"=r"(grayPixels):[in1]"r"(pixel1),[in2]"r"(pixel2));
-        gray[0] = grayPixels;
-        gray++;
-      }
-#else
     for (int line = 0; line < camParams.nrOfLinesPerImage; line++) {
       for (int pixel = 0; pixel < camParams.nrOfPixelsPerLine; pixel++) {
         uint16_t rgb = swap_u16(rgb565[line*camParams.nrOfPixelsPerLine+pixel]);
@@ -51,7 +41,6 @@ int main () {
         grayscale[line*camParams.nrOfPixelsPerLine+pixel] = gray;
       }
     }
-#endif
     asm volatile ("l.nios_rrr %[out1],r0,%[in2],0xC":[out1]"=r"(cycles):[in2]"r"(1<<8|7<<4));
     asm volatile ("l.nios_rrr %[out1],%[in1],%[in2],0xC":[out1]"=r"(stall):[in1]"r"(1),[in2]"r"(1<<9));
     asm volatile ("l.nios_rrr %[out1],%[in1],%[in2],0xC":[out1]"=r"(idle):[in1]"r"(2),[in2]"r"(1<<10));
