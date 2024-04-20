@@ -22,64 +22,89 @@ module ramDmaCiTestBench;
     reg [7:0] customId;
     reg [7:0] ciN;
 
-    ramDmaCi #(8'h01 ) DUT
+    ramDmaCi #(8'h0D ) DUT
          (.clock(clock),
           .reset(reset),
           .start(start),
           .valueA(valueA),
           .valueB(valueB),
-          
-          .ciN(ciN));
+          .iseId(ciN));
   
   initial
     begin
       $dumpfile("fifoSignals.vcd"); /* define the name of the .vcd file that can be viewed by GTKWAVE */
       $dumpvars(1,DUT);             /* dump all signals inside the DUT-component in the .vcd file */
+      $dumpvars(1,DUT.ram.memoryContent[0], DUT.ram.memoryContent[1], DUT.ram.memoryContent[2], DUT.ram.memoryContent[3]);
     end
 
   initial
     begin
-
-        start = 1'b0;
-        valueA = 32'd0;
-        valueB = 32'd0;
-
-        @(negedge reset);            /* wait for the reset period to end */
-        repeat(2) @(negedge clock);  /* wait for 2 clock cycles */
-        start = 1'b1;
-        valueA = 32'h100;
-        valueB = 32'hFF;
-        ciN = 8'd1;
-        repeat(1) @(negedge clock);
-
-        valueA = 32'h000;
-        valueB = 32'h00;
-        ciN = 8'd0;
-
-        repeat(1) @(negedge clock);
-
-        ciN = 8'd1;
-
-        valueA = 32'h000;
-        valueB = 32'h00;
-        repeat(1) @(negedge clock);
-
-        ciN = 8'd0;
-
-        valueA = 32'h000;
-        valueB = 32'h00;
-
-        repeat(1) @(negedge clock);
         
+        start <= 1'b0;
+        valueA <= 32'd0;
+        valueB <= 32'd0;
+        @(negedge reset);            /* wait for the reset period to end */
+        repeat(2) @(posedge clock);  /* wait for 2 clock cycles */
 
+        start <= 1'b1;
+        valueA <= 32'd512 | 32'd0;
+        valueB <= 32'hFE;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
 
+        valueA <= 32'd512 | 32'd1;
+        valueB <= 32'h17;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
 
+        valueA <= 32'd512 | 32'd2;
+        valueB <= 32'h18;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
 
+        valueA <= 32'd512 | 32'd3;
+        valueB <= 32'h19;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
 
+        //read
+        start <= 1'b1;
+        valueA <= 32'd2;
+        valueB <= 32'h22;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
+        start <= 1'b0;
+        ciN <= 8'd0;
+        repeat(1) @(posedge clock);
 
-
-
+        start <= 1'b1;
+        valueA <= 32'd1;
+        valueB <= 32'h23;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
+        start <= 1'b0;
+        ciN <= 8'd0;
+        repeat(1) @(posedge clock);
       
+        start <= 1'b1;
+        valueA <= 32'd3;
+        valueB <= 32'h24;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
+        start <= 1'b0;
+        ciN <= 8'd0;
+        repeat(1) @(posedge clock);
+
+        start <= 1'b1;
+        valueA <= 32'd0;
+        valueB <= 32'h24;
+        ciN <= 8'd13;
+        repeat(1) @(posedge clock);
+        start <= 1'b0;
+        ciN <= 8'd0;
+        repeat(1) @(posedge clock);
+
+        repeat(2) @(posedge clock);
       $finish;                     /* finish the simulation */
     end
 
