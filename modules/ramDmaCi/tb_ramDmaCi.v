@@ -34,7 +34,7 @@ module ramDmaCiTestBench;
     begin
       $dumpfile("fifoSignals.vcd"); /* define the name of the .vcd file that can be viewed by GTKWAVE */
       $dumpvars(1,DUT);             /* dump all signals inside the DUT-component in the .vcd file */
-      $dumpvars(1,DUT.ram.memoryContent[0], DUT.ram.memoryContent[1], DUT.ram.memoryContent[2], DUT.ram.memoryContent[3]);
+      $dumpvars(1,DUT.memoryContent[0], DUT.memoryContent[1], DUT.memoryContent[2], DUT.memoryContent[3]);
     end
 
   initial

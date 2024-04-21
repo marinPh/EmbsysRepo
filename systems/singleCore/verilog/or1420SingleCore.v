@@ -312,8 +312,8 @@ module or1420SingleCore ( input wire         clock12MHz,
    * Here we instantiate the CPU
    *
    */
-  wire [31:0] s_cpu1CiResult, s_profileResult, s_grayResult;
-  wire [31:0] s_cpu1CiDataA, s_cpu1CiDataB, s_camCiResult, s_delayResult;
+  wire [31:0] s_cpu1CiResult, s_profileResult, s_grayResult, s_mymemResult;
+  wire [31:0] s_cpu1CiDataA, s_cpu1CiDataB, s_camCiResult, s_delayResult, s_testResult;
   wire [7:0]  s_cpu1CiN;
   wire        s_cpu1CiRa, s_cpu1CiRb, s_cpu1CiRc, s_cpu1CiStart, s_cpu1CiCke, s_cpu1CiDone, s_i2cCiDone, s_delayCiDone;
   wire [4:0]  s_cpu1CiA, s_cpu1CiB, s_cpu1CiC;
@@ -324,10 +324,10 @@ module or1420SingleCore ( input wire         clock12MHz,
   wire [3:0]  s_cpu1byteEnables;
   wire        s_cpu1DataValid;
   wire [7:0]  s_cpu1BurstSize;
-  wire        s_spm1Irq, s_profileDone, s_stall, s_grayDone;
+  wire        s_spm1Irq, s_profileDone, s_stall, s_grayDone, s_mymemDone, s_testCiDone;
   
-  assign s_cpu1CiDone = s_hdmiDone | s_swapByteDone | s_flashDone | s_cpuFreqDone | s_i2cCiDone | s_delayCiDone | s_camCiDone | s_profileDone | s_grayDone;
-  assign s_cpu1CiResult = s_hdmiResult | s_swapByteResult | s_flashResult | s_cpuFreqResult | s_i2cCiResult | s_camCiResult | s_delayResult | s_profileResult | s_grayResult; 
+  assign s_cpu1CiDone = s_hdmiDone | s_swapByteDone | s_flashDone | s_cpuFreqDone | s_i2cCiDone | s_delayCiDone | s_camCiDone | s_profileDone | s_grayDone | s_mymemDone | s_testCiDone;
+  assign s_cpu1CiResult = s_hdmiResult | s_swapByteResult | s_flashResult | s_cpuFreqResult | s_i2cCiResult | s_camCiResult | s_delayResult | s_profileResult | s_grayResult | s_mymemResult | s_testResult; 
 
   or1420Top #( .NOP_INSTRUCTION(32'h1500FFFF)) cpu1
              (.cpuClock(s_systemClock),
@@ -464,6 +464,27 @@ module or1420SingleCore ( input wire         clock12MHz,
                        .done(s_grayDone),
                        .result(s_grayResult) );
   
+  //custom memory
+  ramDmaCi #(.customInstructionId(8'd14)) mymem
+            (.clock(s_systemClock),
+             .reset(s_cpuReset),
+             .ciStart(s_cpu1CiStart),
+             .ciN(s_cpu1CiN),
+             .ciValueA(s_cpu1CiDataA),
+             .ciValueB(s_cpu1CiDataB),
+             .ciDone(s_testCiDone),
+             .ciResult(s_testResult));
+  
+    /*test #(.customInstructionId(8'd15) ) delayCC
+            (.clock(s_systemClock),
+             .reset(s_cpuReset),
+             .ciStart(s_cpu1CiStart),
+             .ciN(s_cpu1CiN),
+             .ciValueA(s_cpu1CiDataA),
+             .ciValueB(s_cpu1CiDataB),
+             .ciDone(s_testCiDone),
+             .ciResult(s_testResult));*/
+
   /*
    *
    * Here we define the camera interface

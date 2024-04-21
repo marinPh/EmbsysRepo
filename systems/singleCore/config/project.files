@@ -15,7 +15,9 @@
 ../../../modules/spi/verilog/spiBus.v
 ../../../modules/i2c/verilog/i2cMaster.v
 ../../../modules/i2c/verilog/i2cCustomInstr.v
+../../../modules/ramDmaCi/dualPortSSRAM.v
 ../../../modules/ramDmaCi/ramDmaCi.v
+../../../modules/ramDmaCi/test.v
 ../../../modules/profileCi/verilog/counter.v
 ../../../modules/profileCi/verilog/profileCi.v
 ../../../modules/grayscaleCi/verilog/rgb565Grayscale.v
