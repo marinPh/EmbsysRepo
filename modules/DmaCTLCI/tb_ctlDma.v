@@ -57,14 +57,14 @@ module tb_dmaController;
 
         //test case 1 set burst size to 1
         start = 1;
-        valueA = 32'h100;
+        valueA = 32'h80;
         valueB = 32'h1;
         ciN = 8'd12;
 
         #10
         start = 0;
         //set control_reg to 1
-        valueA = 32'h1410;
+        valueA = 32'h1420;
         valueB = 32'h1;
 
         #10
