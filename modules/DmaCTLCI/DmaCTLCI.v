@@ -28,6 +28,8 @@ module ramDmaCi #(parameter[7:0] customId = 8'h00)
                 wire [31:0] newA;
                 reg aquired;
 
+                wire gtg;
+
 initial begin
     start_address_bus = 0;
     start_address_mem = 0;
@@ -36,6 +38,8 @@ initial begin
     control_reg = 0;
     block_size = 0;
 end
+
+assign gtg = status_reg & aquired & (started == 1) & (ciN == customId);
 
 
 always @(posedge clock) begin
@@ -86,7 +90,6 @@ end
     else begin
         burst_reset <= 1;
     end
-
     end
     // check if 10th to 12th bit is equal to 1
     if (valueA[12:10] == 3'b001) begin
@@ -188,12 +191,7 @@ assign result = r_result;
   counter #(8) BurstCounter
          (.reset(burst_reset),
           .clock(clock),
-          .enable(status_reg & aquired),
+          .enable(gtg),
           .direction(1),
           .counterValue(burst_counter));
-
-
-
-
-
 endmodule
