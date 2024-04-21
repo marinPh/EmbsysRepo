@@ -12,7 +12,8 @@ module DmaCTLCI #(parameter[7:0] customId = 8'h00)
                 output wire [31:0] result,
                 output wire bus_request,
                 begin_transaction,
-                 data_valid,end_transaction);
+                 data_valid,
+                 end_transaction);
                reg [31:0]delayed_valueB;
                reg [8:0]start_address_bus;
                 reg [8:0]start_address_mem;
@@ -55,8 +56,7 @@ $display("bus error");
 end
 
 //if reset is 1, reset all values
-if (reset == 1'b1)
-begin
+if (reset == 1'b1)begin
 $display("reset");
     start_address_bus <= 0;
     start_address_mem <= 0;
@@ -72,124 +72,119 @@ $display("reset");
     writing <= 0;
     delayed_valueB <= 0;
     aquired <= 0;
-
-
 end
-else begin
-if (start == 1'b1) begin
-$display("start");
-    started <= 1;
-end
-
-if (started == 1 && ciN == customId) begin
-$display("inside");
-if(bus_aquire == 1) begin
-$display("bus aquired");
-    aquired <= 1;
-
-end
-    if(status_reg == 0 && control_reg ==1 && aquired == 1) begin
-    $display("status reg set");
-    status_reg =1;
-
-    control_reg <= 0;
-    writing = control_reg[0];
-    end
-    if(status_reg ==1)begin
-    if (burst_counter < block_size) begin
-        r_done = 0;
-    end
     else begin
+    if (start == 1'b1) begin
+    $display("start");
+        started <= 1;
+    end
 
-        aquired = 0;
-        status_reg = 0;
-        r_done = 1;
-    end
-    // check if 10th to 12th bit is equal to 1
-    if (valueA[12:10] == 3'b001) begin
-    $display("valueA[12:10] == 3'b001");
-        //now check if 9th bit is 1 or 0  and status reg is 0
-        if (valueA[9] == 1'b1 && status_reg == 0 ) begin
-          //if 9th is 1 write valueB to start_address_bus
-            start_address_bus <= valueB[31:0];
-            r_done = 1;
+    if (started == 1 && ciN == customId) begin
+        
+        if(bus_aquire == 1) begin
+            aquired <= 1;
         end
-        else begin
-            //if 9th is 0 read from start_address_bus
-            r_result <= start_address_bus;
-            r_done = 1;
-        end
-    end
-    //check if 10th to 12th bit is equal to 2
-    else if (valueA[12:10] == 3'b010) begin
-    $display("valueA[12:10] == 3'b010");
-        //check if 9th bit is 1 or 0
-        if (valueA[9] == 1'b1 && status_reg == 0) begin
-            //if 9th is 1 write valueB to start_address_mem
-            start_address_mem <= valueB[8:0];
-            r_done = 1;
-        end
-        else begin
-            //if 9th is 0 read from start_address_mem
-            r_result <= start_address_mem;
-            r_done = 1;
-        end
-    end
-    //check if 10th to 12th bit is equal to 3
-    else if (valueA[12:10] == 3'b011) begin
-    $display("valueA[12:10] == 3'b011");
-        //check if 9th bit is 1 or 0
-        if (valueA[9] == 1'b1 && status_reg == 0) begin
-            //if 9th is 1 write valueB to block_size
-            block_size <= valueB[9:0];
-            r_done = 1;
-        end
-        else begin
 
-            //if 9th is 0 read from burst_size
-            r_result <= block_size;
-            r_done = 1;
+        if(status_reg == 0 && control_reg ==1 && aquired == 1) begin
+            $display("status reg set");
+            status_reg =1;
+            control_reg <= 0;
+            writing = control_reg[0];
+        end
+
+        if(status_reg == 1)begin
+            if (burst_counter < block_size) begin
+                r_done = 0;
+            end
+            else begin
+                aquired = 0;
+                status_reg = 0;
+                r_done = 1;
+        
+            end
+        end
+          
+            case(valueA[12:10])
+
+                3'b001 :begin if (valueA[9] == 1'b1 && status_reg == 0 ) begin
+                      //if 9th is 1 write valueB to start_address_bus
+                        start_address_bus <= valueB[31:0];
+                        r_done = 1;
+                    end
+                    else begin
+                        //if 9th is 0 read from start_address_bus
+                        r_result <= start_address_bus;
+                        r_done = 1;
+                    end
+                end
+
+                3'b010: begin
+                    //check if 9th bit is 1 or 0
+                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                        //if 9th is 1 write valueB to start_address_mem
+                        start_address_mem <= valueB[8:0];
+                        r_done = 1;
+                    end
+                    else begin
+                        //if 9th is 0 read from start_address_mem
+                        r_result <= start_address_mem;
+                        r_done = 1;
+                    end
+                end
+
+                3'b011: begin
+                 //check if 9th bit is 1 or 0
+                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                        //if 9th is 1 write valueB to block_size
+                        block_size <= valueB[9:0];
+                        r_done = 1;
+                    end
+                    else begin
+                    
+                        //if 9th is 0 read from burst_size
+                        r_result <= block_size;
+                        r_done = 1;
+                    end
+
+                end
+
+                3'b100: begin
+                    //check if 9th bit is 1 or 0
+                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                        //if 9th is 1 write valueB to burst_size
+                        burst_size <= valueA[7:0];
+                        r_done = 1;
+                    end
+                    else begin
+                        //if 9th is 0 read from burst_size
+                        r_result <= burst_size;
+                        r_done = 1;
+                    end
+                end
+
+                3'b101: begin
+                    //check if 9th bit is 1 or 0
+                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                        //if 9th is 1 write valueB to control_reg
+                        control_reg <= valueB[1:0];
+                        r_done = 1;
+                    end
+                    else begin
+                        //if 9th is 0 read from control_reg
+                        r_result <= status_reg;
+                        r_done = 1;
+                    end
+                end
+            endcase
+            // check if 10th to 12th bit is equal to 
         end
     end
-    //check if 10th to 12th bit is equal to 4
-    else if (valueA[12:10] == 3'b100) begin
-    $display("valueA[12:10] == 3'b100");
-        //check if 9th bit is 1 or 0
-        if (valueA[9] == 1'b1 && status_reg == 0) begin
-            //if 9th is 1 write valueB to burst_size
-            burst_size <= valueA[7:0];
-            r_done = 1;
-        end
-        else begin
-            //if 9th is 0 read from burst_size
-            r_result <= burst_size;
-            r_done = 1;
-        end
-    end
-    //check if 10th to 12th bit is equal to 5
-    else if (valueA[12:10] == 3'b101) begin
-        //check if 9th bit is 1 or 0
-        if (valueA[9] == 1'b1) begin
-         // if 9th is 1 write valueB to control_reg
-         $display("writing to control_reg");
-            control_reg = valueB[1:0];
-            r_done = 1;
-        end
-        else begin
-            //if 9th is 0 read from control_reg
-            r_result = status_reg;
-            r_done = 1;
-        end
-    end
-end
-end
-end
 end
 
 always @(negedge clock)
-begin
     delayed_valueB <= valueB;
-end
+
+
 
 //2 different valueAs 1 for reading one by one, 1 for burst reading
 //9th bit is the reg writing bit

@@ -64,7 +64,7 @@ module tb_dmaController;
         #10
         start = 0;
         //set control_reg to 1
-        valueA = 32'h1420;
+        valueA = 32'h1700;
         valueB = 32'h1;
 
         #10
