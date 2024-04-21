@@ -14,7 +14,7 @@ module ramDmaCi #(parameter[7:0] customId = 8'h00)
 reg [31:0] ram [511:0];
 
 reg started;
- reg almost_done;
+reg almost_done;
 
  integer i;
 
@@ -33,7 +33,7 @@ begin
 
     data_out <= 0;
     almost_done <= 0;
-    for (i = 0; i < 512; i++)
+    for (i = 0; i < 512; i =i+1)
     begin
         ram[i] <= 0;
     end
@@ -48,6 +48,7 @@ begin
         begin
             data_out <= ram[address];
             almost_done = 1;
+            reading <= 0;
         end
         else
         if (started & (ciN == customId) & (valueA[31:9] == 0))

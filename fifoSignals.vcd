@@ -1,0 +1,106 @@
+$date
+	Tue Apr 16 14:27:26 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module ramDmaCiTestBench $end
+$scope module DUT $end
+$var wire 8 ! ciN [7:0] $end
+$var wire 1 " clock $end
+$var wire 1 # done $end
+$var wire 1 $ reset $end
+$var wire 32 % result [31:0] $end
+$var wire 1 & start $end
+$var wire 32 ' valueA [31:0] $end
+$var wire 32 ( valueB [31:0] $end
+$var reg 8 ) address [7:0] $end
+$var reg 1 * almost_done $end
+$var reg 32 + data_out [31:0] $end
+$var reg 1 , reading $end
+$var reg 1 - started $end
+$var integer 32 . i [31:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx .
+x-
+x,
+bx +
+x*
+bx )
+b0 (
+b0 '
+0&
+bx %
+1$
+x#
+0"
+bx !
+$end
+#5
+0#
+0*
+b0 %
+b0 +
+0,
+0-
+b1000000000 .
+1"
+#10
+0"
+#15
+b1000000000 .
+1"
+#20
+0$
+0"
+#25
+1"
+#30
+0"
+#35
+1"
+#40
+b1 !
+b11111111 (
+b100000000 '
+1&
+0"
+#45
+1#
+1*
+1-
+1"
+#50
+b0 !
+b0 (
+b0 '
+0"
+#55
+1"
+#60
+b1 !
+0"
+#65
+1,
+b0 )
+0#
+0*
+1"
+#70
+b0 !
+0"
+#75
+b11111111 %
+b11111111 +
+1#
+1*
+1"
+#80
+0"
