@@ -27,7 +27,6 @@ module ramDmaCi #(parameter[7:0] customId = 8'h00)
                 reg data_valid;
                 wire [31:0] newA;
                 reg aquired;
-
                 wire gtg;
 
 initial begin
@@ -89,7 +88,7 @@ end
     end
     else begin
         burst_reset <= 1;
-    end
+
     end
     // check if 10th to 12th bit is equal to 1
     if (valueA[12:10] == 3'b001) begin
@@ -161,6 +160,7 @@ end
             r_done = 1;
         end
     end
+end
 end
 end
 end
