@@ -272,11 +272,11 @@
 					"strict" : false
 				},
 				{
-					"name" : "camPclk",
+					"name" : "biosBypass",
 					"strict" : false
 				},
 				{
-					"name" : "biosBypass",
+					"name" : "camPclk",
 					"strict" : false
 				},
 				{
