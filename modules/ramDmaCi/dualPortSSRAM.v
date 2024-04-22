@@ -1,6 +1,6 @@
 module dualPortSSRAM #( parameter bitwidth = 8,
                         parameter nrOfEntries = 512)
-                      ( input wire                             clockA, clockB,
+                      ( input wire                             clock,
                                                                writeEnableA, writeEnableB,
                         input wire [$clog2(nrOfEntries)-1 : 0] addressA, addressB,
                         input wire [bitwidth-1 : 0]            dataInA, dataInB,
@@ -8,13 +8,13 @@ module dualPortSSRAM #( parameter bitwidth = 8,
   
   reg [bitwidth-1 : 0] memoryContent [nrOfEntries-1 : 0];
   
-  always @(posedge clockA)
+  always @(posedge clock)
     begin
       if (writeEnableA == 1'b1) memoryContent[addressA] = dataInA;
       dataOutA = memoryContent[addressA];
     end
 
-  always @(posedge clockB)
+  always @(negedge clock)
     begin
       if (writeEnableB == 1'b1) memoryContent[addressB] = dataInB;
       dataOutB = memoryContent[addressB];
