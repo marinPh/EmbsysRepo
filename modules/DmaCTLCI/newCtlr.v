@@ -40,8 +40,9 @@ initial begin
     burst_size = 0;
     control_reg = 0;
     block_size = 0;
+    state = 0;
 end
-assign gtg = status_reg & aquired & (started == 1) & (ciN == customId);
+assign gtg = (state == 2) & (started == 1) & (ciN == customId) & (!slave_busy);
 always @(posedge clock) begin
 //if bus error is 1, set burst_reset to 1
 if (bus_error == 1'b1) begin
@@ -193,7 +194,7 @@ end
                 block_reset <= 1;
                 end_transaction <= 1;
             end
-            else if(burst_counter == burst_size) begin
+            else if(burst_counter == burst_size+1) begin
                 state = 1;
                 burst_reset <= 1;
                 end_transaction <=1;
@@ -214,7 +215,12 @@ assign newA = (burst_counter == 0) ? valueA : (valueA[8:0] + burst_counter ) | w
 assign data_valid = (status_reg == 1 || valueA[12:10] == 3'b000) ? w_done : r_done;
 assign result = (status_reg == 1 || valueA[12:10] == 3'b000) ? w_result : r_result;
 assign bus_request = (state == 1 ) ? 1 : 0;
-assign end_transaction = (bus_error == 1) ? 1 : 0;
+
+//TODO: find a combination for end_transaction and start transaction
+
+
+
+
 
 // init ramModule
   ramDmaCi #( customId ) DUT
