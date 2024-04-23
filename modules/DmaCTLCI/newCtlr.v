@@ -177,12 +177,16 @@ end
         //now we are in transaction state
         //transaction state is where we are reading or writing to the bus
         2: begin
+            //TODO: need to understand better bus error and how to handle it
             if (writing == 1) begin
+                
                 //if we are writing, we write ram[start_bus_address+blockcounter] = valueB so
                 //newA = start_bus_addres + block_counter
                 newA = start_address_bus + burst_counter;
             end
             else begin
+                //TODO: if in_valid is false what should I do wait ?
+                
                 //if we are reading, we read from the bus and write to ram[start_mem_address+block_counter]
                 //newA = start_mem_address + block_counter
                 newA = start_address_mem + burst_counter;
@@ -192,12 +196,13 @@ end
                 state <= 0;
                 burst_reset <= 1;
                 block_reset <= 1;
-                end_transaction <= 1;
+               
+                //TODO: need understand how to valid_data is set
             end
             else if(burst_counter == burst_size+1) begin
                 state = 1;
                 burst_reset <= 1;
-                end_transaction <=1;
+        
             end
         end
         endcase
