@@ -17,7 +17,7 @@ module tb_dmaController;
     wire end_transaction;
     wire slave_busy;
     wire begin_transaction;
-    wire bus_aquire;
+    reg bus_aquire =0;
     wire in_valid;
 
     // Instantiate the DMA Controller
@@ -57,8 +57,9 @@ module tb_dmaController;
 
         //test case 1 set burst size to 1
         start = 1;
-        valueA = 32'h80;
-        valueB = 32'h1;
+        #10
+        valueA = 32'hC00;
+        valueB = 32'h3;
         ciN = 8'd12;
 
         #10
@@ -66,8 +67,12 @@ module tb_dmaController;
         //set control_reg to 1
         valueA = 32'h1700;
         valueB = 32'h1;
-
         #10
+        valueA = 32'h1600;
+        valueB = 32'h0;
+        bus_aquire = 1;
+        #10
+
        
 
         // Finish simulation

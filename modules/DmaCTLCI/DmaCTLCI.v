@@ -78,7 +78,6 @@ end
     $display("start");
         started <= 1;
     end
-
     if (started == 1 && ciN == customId) begin
         
         if(bus_aquire == 1) begin
@@ -88,8 +87,8 @@ end
         if(status_reg == 0 && control_reg ==1 && aquired == 1) begin
             $display("status reg set");
             status_reg =1;
-            control_reg <= 0;
             writing = control_reg[0];
+            control_reg = 0;
         end
 
         if(status_reg == 1)begin
@@ -103,10 +102,13 @@ end
         
             end
         end
+        $display("valueA[12:10] %b", valueA[12:10]);
           
             case(valueA[12:10])
 
-                3'b001 :begin if (valueA[9] == 1'b1 && status_reg == 0 ) begin
+                3'b001 :begin 
+                    $display("case 1");
+                    if (valueA[9] == 1'b1 && status_reg == 0 ) begin
                       //if 9th is 1 write valueB to start_address_bus
                         start_address_bus <= valueB[31:0];
                         r_done = 1;
@@ -119,6 +121,7 @@ end
                 end
 
                 3'b010: begin
+                    $display("case 2");
                     //check if 9th bit is 1 or 0
                     if (valueA[9] == 1'b1 && status_reg == 0) begin
                         //if 9th is 1 write valueB to start_address_mem
@@ -133,6 +136,7 @@ end
                 end
 
                 3'b011: begin
+                    $display("case 3");
                  //check if 9th bit is 1 or 0
                     if (valueA[9] == 1'b1 && status_reg == 0) begin
                         //if 9th is 1 write valueB to block_size
@@ -149,8 +153,10 @@ end
                 end
 
                 3'b100: begin
+                    $display("case 4");
                     //check if 9th bit is 1 or 0
-                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                    if (valueA[9] == 1'b1 && status_reg == 2'b0) begin
+                
                         //if 9th is 1 write valueB to burst_size
                         burst_size <= valueA[7:0];
                         r_done = 1;
@@ -163,6 +169,7 @@ end
                 end
 
                 3'b101: begin
+                    $display("case 5");
                     //check if 9th bit is 1 or 0
                     if (valueA[9] == 1'b1 && status_reg == 0) begin
                         //if 9th is 1 write valueB to control_reg
