@@ -6,24 +6,28 @@ module newDMA #(parameter[7:0] customId = 8'h00)
                             bus_aquire,
                             in_valid,
                             slave_busy,
+                            in_end,
+                            in_begin,
                 input wire [31:0] valueA,
                                     valueB,
+                                    in_data,
                 input wire [ 7 : 0 ] ciN,
-                output wire [31:0] result,
+                output wire [31:0] address_data,
+                output wire [3:0] BE,
                 output wire bus_request,
                 begin_transaction,
-                 data_valid,
+                 data_valid,busy,
                  end_transaction);
                reg [31:0]delayed_valueB;
                reg [8:0]start_address_bus;
                 reg [8:0]start_address_mem;
                 reg [7:0]burst_size;
                 wire [7:0]burst_counter;
+                wire [7:0]block_counter;
                 reg [1:0]control_reg;
                 reg [1:0]status_reg;
                 reg [9:0]block_size;
                 reg started;
-                reg [31:0]r_result;
                 reg r_done;
                 wire w_done;
                 wire [31:0] w_result;
@@ -33,7 +37,7 @@ module newDMA #(parameter[7:0] customId = 8'h00)
                 reg r_request;
                 wire [31:0] newA;
                 reg aquired;
-                wire gtg;
+                wire enable_counters;
 initial begin
     start_address_bus = 0;
     start_address_mem = 0;
@@ -42,15 +46,10 @@ initial begin
     block_size = 0;
     state = 0;
 end
-assign gtg = (state == 2) & (started == 1) & (ciN == customId) & (!slave_busy);
+
 always @(posedge clock) begin
 //if bus error is 1, set burst_reset to 1
-if (bus_error == 1'b1) begin
-$display("bus error");
-    aquired <= 0;
-    status_reg = status_reg | 2;
-    r_done <= 0;
-end
+
 //if reset is 1, reset all values
 if (reset == 1'b1)begin
 $display("reset");
@@ -63,7 +62,7 @@ $display("reset");
 
     status_reg <= 0;
     aquired <= 0;
-    r_result <= 0;
+
     r_done <= 0;
     writing <= 0;
     delayed_valueB <= 0;
@@ -85,7 +84,7 @@ end
             if (control_reg > 0) begin
                 state <= 1;
                 writing <= control_reg[0];
-                block_reset <= 1;
+    
                 
             end
             else begin
@@ -99,7 +98,7 @@ end
                     end
                     else begin
                         //if 9th is 0 read from start_address_bus
-                        r_result <= start_address_bus;
+                        //r_result <= start_address_bus;
                         r_done = 1;
                     end
                 end
@@ -114,7 +113,7 @@ end
                     end
                     else begin
                         //if 9th is 0 read from start_address_mem
-                        r_result <= start_address_mem;
+                        //r_result <= start_address_mem;
                         r_done = 1;
                     end
                 end
@@ -129,7 +128,7 @@ end
                     else begin
                     
                         //if 9th is 0 read from burst_size
-                        r_result <= block_size;
+                        //r_result <= block_size;
                         r_done = 1;
                     end
 
@@ -145,7 +144,7 @@ end
                     end
                     else begin
                         //if 9th is 0 read from burst_size
-                        r_result <= burst_size;
+                        //r_result <= burst_size;
                         r_done = 1;
                     end
                 end
@@ -159,7 +158,7 @@ end
                     end
                     else begin
                         //if 9th is 0 read from control_reg
-                        r_result <= status_reg;
+                        //r_result <= status_reg;
                         r_done = 1;
                     end
                 end
@@ -169,41 +168,36 @@ end
         //now we are in asking state we have already requested
         1: begin
             if (bus_aquire == 1) begin
-                state <= 2;
+                state <= 3;
                 aquired <= 1;
-                burst_reset <=0;
+     
             end
         end
         //now we are in transaction state
         //transaction state is where we are reading or writing to the bus
         2: begin
             //TODO: need to understand better bus error and how to handle it
-            if (writing == 1) begin
-                
-                //if we are writing, we write ram[start_bus_address+blockcounter] = valueB so
-                //newA = start_bus_addres + block_counter
-                newA = start_address_bus + burst_counter;
-            end
-            else begin
-                //TODO: if in_valid is false what should I do wait ?
-                
-                //if we are reading, we read from the bus and write to ram[start_mem_address+block_counter]
-                //newA = start_mem_address + block_counter
-                newA = start_address_mem + burst_counter;
-            end
+           
             //if burst_counter is equal to block_size, we reset the burst_counter and go to idle
-            if (block_counter == block_size) begin
+            if(bus_error ==1) begin
+                //TODO: handle bus error
+                status_reg <= 2;
                 state <= 0;
-                burst_reset <= 1;
-                block_reset <= 1;
-               
-                //TODO: need understand how to valid_data is set
+            end
+            else if (block_counter == block_size || in_end==1) begin
+                state <= 0;
+                control_reg <= 0;
+                status_reg <= 0;
             end
             else if(burst_counter == burst_size+1) begin
                 state = 1;
-                burst_reset <= 1;
+       
+                status_reg <= 0;
         
             end
+        end
+        3: begin
+            state <= 2;
         end
         endcase
         end
@@ -211,17 +205,28 @@ end
 end
 
 always @(negedge clock)
-    delayed_valueB <= valueB;
+    delayed_valueB <= dividedB;
 //2 different valueAs 1 for reading one by one, 1 for burst reading
 //9th bit is the reg writing bit
-assign newA = (burst_counter == 0) ? valueA : (valueA[8:0] + burst_counter ) | writing << 9;
+//if state = 0 then valueB else in_data
+assign dividedB = (state == 0) ? valueB : in_data;
+assign block_reset = (state == 0) ? 1 : 0;
+assign burst_reset = (state != 2) ? 1 : 0;
+
+assign newA = (state == 0) ? valueA : (state == 2) ? (writing == 1) ? start_address_bus + block_counter : start_address_mem + block_counter: 0;
 //if status reg is 1 or valueA[12:10] is 0, set data_valid to w_done, rest is r_done
-
-assign data_valid = (status_reg == 1 || valueA[12:10] == 3'b000) ? w_done : r_done;
-assign result = (status_reg == 1 || valueA[12:10] == 3'b000) ? w_result : r_result;
+assign data_valid = (state == 2  && writing==0)? 1'b1 : 1'b0;
+//enable counters if we are state 2 and writing is 1 and slave_busy ==0 or state2 writing is 0 and data_valid is 1
+assign enable_counters = (state == 2 && writing && !slave_busy) || (state == 2 && !writing)? 1 : 0;
+// if state == 3 address, if state == 2 w_result else 0
+assign address_data =  (state == 3) ? (writing==1) ? start_address_bus:start_address_mem : (state == 2) ? w_result : 0;
 assign bus_request = (state == 1 ) ? 1 : 0;
-
+assign end_transaction = (state == 2 && burst_counter == burst_size +1 || block_counter == block_size || bus_error ==1) ? 1 : 0;
 //TODO: find a combination for end_transaction and start transaction
+//w_burst_size is burst_size when begin transaction is 1 else 0
+assign w_burst_size = (state ==3) ? burst_size : 0;
+assign BE = 4'hF;
+assign busy = 0;
 
 
 
@@ -242,14 +247,14 @@ assign bus_request = (state == 1 ) ? 1 : 0;
     counter #(8) BlockCounter
          (.reset(block_reset),
           .clock(clock),
-          .enable(),
+          .enable(enable_counters),
           .direction(1'b1),
           .counterValue(block_counter));
 
   counter #(8) BurstCounter
          (.reset(burst_reset),
           .clock(clock),
-          .enable(),
+          .enable(enable_counters),
           .direction(1'b1),
           .counterValue(burst_counter));
 endmodule
