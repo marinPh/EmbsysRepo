@@ -19,6 +19,7 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
                                      readNotWriteIn,
                                      dataValidIn,
                                      busErrorIn,
+                                     busyIn,
                   input wire [31:0]  addressDataIn,
                   input wire [3:0]   byteEnablesIn,
                   input wire [7:0]   burstSizeIn,
@@ -51,6 +52,7 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
     reg [9:0] blockSize;
     reg [7:0] burstSize;
     reg [1:0] status;
+    reg doWrite;
 
     //write values to operation registers
     always @ (posedge clock) begin
@@ -59,11 +61,15 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
         memoryStartAddress = 9'b0;
         blockSize = 10'b0;
         burstSize = 8'b0;
+        doWrite = 1'b0;
       end else if (isMyCi & writeEnableCPU) begin
         busStartAddress <= (memoryOp == OP_BUS_SA) ? ciValueB : busStartAddress;
         memoryStartAddress <= (memoryOp == OP_MEM_SA) ? ciValueB[8:0] : memoryStartAddress;
         blockSize <= (memoryOp == OP_BLOCK_SIZE) ? ciValueB[9:0] : blockSize;
         burstSize <= (memoryOp == OP_BURST_SIZE) ? ciValueB[7:0] : burstSize;
+        doWrite <=  (memoryOp != OP_CONTROL) ? doWrite :
+                    (ciValueB[0] == 1'b1) ? 1'b0 :
+                    (ciValueB[1] == 1'b1) ? 1'b1 : 1'b0;
       end
     end
 
@@ -130,7 +136,7 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
    * Here the bus interface is defined
    *
    */
-    localparam [3:0] IDLE = 4'd0, REQUEST = 4'd1, INIT = 4'd2, COMPUTE_BURSTSIZE = 4'd3, READ = 4'd4, WRITE = 4'd5, ERROR = 4'd6, TRANSFER_DONE = 4'd7;
+    localparam [3:0] IDLE = 4'd0, REQUEST = 4'd1, INIT = 4'd2, COMPUTE_BURSTSIZE = 4'd3, READ = 4'd4, ERROR = 4'd6, WRITE = 4'd7, WRITE_DONE_OK = 4'd8, WRITE_DONE_ERR = 4'd9;
     reg [31:0] s_busAddressInReg, s_addressDataOutReg;
     reg [31:0] s_busAddressReg;
     reg [31:0] s_busDataInReg, s_busDataOutReg;
@@ -154,15 +160,14 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
    *
    */
 
-  reg [8:0] s_bufferAddressReg, nextBufferAddress;
-  reg [7:0] nextBurstSize;
+  reg [8:0] s_bufferAddressReg;
+  reg [7:0] nextBurstSize, burstCountReg;
   reg [9:0] remainingBlockSize;
-  reg [32:0] nextBusAddress;
 
-  wire s_startTransfer = isMyCi & writeEnableCPU & (memoryOp == OP_CONTROL) & (s_dmaState == IDLE);
-  
-  //assign endTransactionOut   = s_endTransactionReg;
-  //assign dataValidOut        = s_dataValidOutReg;
+  wire s_startTransfer = isMyCi & writeEnableCPU & (memoryOp == OP_CONTROL) & (s_dmaState == IDLE) & (ciValueB[0] ^ ciValueB[1]);
+
+  assign endTransactionOut   = s_endTransactionReg;
+  assign dataValidOut        = s_dataValidOutReg;
   assign addressDataOut      = s_busDataOutReg;
   assign beginTransactionOut = s_startTransactionOutReg;
   assign requestTransaction = (s_dmaState == REQUEST) ? 1'd1 : 1'd0;
@@ -175,12 +180,15 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
   always @*
     case (s_dmaState)
       IDLE             : s_dmaStateNext <= (s_startTransfer == 1'b1) ? COMPUTE_BURSTSIZE : IDLE;
-      COMPUTE_BURSTSIZE: s_dmaStateNext <= (remainingBlockSize != 9'b0) ? REQUEST : TRANSFER_DONE;
+      COMPUTE_BURSTSIZE: s_dmaStateNext <= (remainingBlockSize != 9'b0) ? REQUEST : IDLE;
       REQUEST          : s_dmaStateNext <= (transactionGranted == 1'b1) ? INIT : REQUEST;
-      INIT             : s_dmaStateNext <= READ;  //todo ad write
+      INIT             : s_dmaStateNext <= doWrite ? WRITE : READ;
       READ             : s_dmaStateNext <= (busErrorIn == 1'b1 && endTransactionIn == 1'b0) ? ERROR :
                                            (busErrorIn == 1'b1) ? IDLE : 
                                            (s_endTransactionInReg == 1'b1) ? COMPUTE_BURSTSIZE : READ;
+      WRITE            : s_dmaStateNext <= (busErrorIn == 1'b1) ? WRITE_DONE_ERR :
+                                           (burstCountReg[7] == 1'b1 && busyIn == 1'b0) ? WRITE_DONE_OK : WRITE;
+      WRITE_DONE_OK    : s_dmaStateNext <= COMPUTE_BURSTSIZE;
       ERROR            : s_dmaStateNext <= (s_endTransactionInReg == 1'b1) ? IDLE : ERROR;
       default          : s_dmaStateNext <= IDLE;
     endcase
@@ -197,18 +205,25 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
       nextBurstSize            <= (reset == 1'd1) ? 8'd0 :
                                   (s_dmaState != COMPUTE_BURSTSIZE) ? nextBurstSize :
                                   (remainingBlockSize > burstSize) ? burstSize : remainingBlockSize[7:0];
+      burstCountReg            <= (s_dmaState == COMPUTE_BURSTSIZE) ? nextBurstSize - 8'd1 :
+                                  ((s_dmaState == WRITE) && ~busyIn) ? burstCountReg - 9'd1 : burstCountReg;
       s_bufferAddressReg       <= (reset == 1'd1) ? 9'd0 :
                                   (s_startTransfer == 1'b1) ? memoryStartAddress :
-                                  ((s_dmaState == READ) && s_busDataInValidReg == 1'd1) ? s_bufferAddressReg + 9'd1 : s_bufferAddressReg;
+                                  ((s_dmaState == READ) && s_busDataInValidReg == 1'd1) ? s_bufferAddressReg + 9'd1 : 
+                                  ((s_dmaState == WRITE) && ~busyIn) ? s_bufferAddressReg + 9'd1 : s_bufferAddressReg;
       s_busAddressReg          <= (reset == 1'b1) ? 32'd0 :
-                                  (s_startTransfer == 1'b1) ? busStartAddress :
-                                  (s_busDataInValidReg == 1'b1 && (s_dmaState == READ)) ? s_busAddressReg + 32'd4 : s_busAddressReg;
-      s_busDataOutReg          <= (s_dmaState == INIT) ? s_busAddressReg : 32'd0;
+                                  (s_startTransfer == 1'b1) ? {busStartAddress[31:2], 2'b0} :
+                                  (s_busDataInValidReg == 1'b1 && (s_dmaState == READ)) ? s_busAddressReg + 32'd4 :
+                                  ((s_dmaState == WRITE) && ~busyIn) ? s_busAddressReg + 32'd4 : s_busAddressReg;
+      s_busDataOutReg          <= (s_dmaState == INIT) ? s_busAddressReg :
+                                  (s_dmaState == WRITE) ? /*bufferDataOut*/ 32'h5BBCFFFF : 32'd0;
+      s_dataValidOutReg        <= (s_dmaState == WRITE) ? 1'b1 : 1'b0;
+      s_endTransactionReg      <= ((s_dmaState == WRITE_DONE_OK) || (s_dmaState == WRITE_DONE_ERR)) ? 1'b1 : 1'b0;
       byteEnablesOut           <= (s_dmaState == INIT) ? 4'hF : 4'd0;
-      readNotWriteOut          <= (s_dmaState == INIT) ? 1'b1 : 1'b0;
+      readNotWriteOut          <= ((s_dmaState == INIT) && ~doWrite) ? 1'b1 : 1'b0;
       burstSizeOut             <= (s_dmaState == INIT) ? nextBurstSize : 8'd0;
       s_startTransactionOutReg <= (s_dmaState == INIT) ? 1'b1 : 1'b0;
-      status[0]                <= ((s_dmaState == INIT) || (s_dmaState == READ) || (s_dmaState == COMPUTE_BURSTSIZE)) ? 1'b1 : 1'b0;
+      status[0]                <= ((s_dmaState == INIT) || (s_dmaState == READ) || (s_dmaState == WRITE) || (s_dmaState == COMPUTE_BURSTSIZE)) ? 1'b1 : 1'b0;
       status[1]                <= (s_dmaState == INIT) ? 1'b0 :
                                   (s_dmaState == ERROR) ? 1'b1 : status[1];
     end
