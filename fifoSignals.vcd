@@ -1,5 +1,5 @@
 $date
-	Thu Apr 25 16:12:43 2024
+	Thu Apr 25 16:51:48 2024
 $end
 $version
 	Icarus Verilog
@@ -10,242 +10,257 @@ $end
 $scope module tb_new $end
 $scope module DUT $end
 $var wire 4 ! BE [3:0] $end
-$var wire 1 " begin_transaction $end
-$var wire 1 # bus_aquire $end
-$var wire 1 $ bus_error $end
-$var wire 1 % busy $end
-$var wire 8 & ciN [7:0] $end
-$var wire 1 ' clock $end
-$var wire 1 " in_begin $end
-$var wire 32 ( in_data [31:0] $end
-$var wire 1 ) in_end $end
-$var wire 1 * in_valid $end
-$var wire 1 + reset $end
-$var wire 1 , slave_busy $end
-$var wire 1 - start $end
-$var wire 32 . valueA [31:0] $end
-$var wire 32 / valueB [31:0] $end
-$var wire 32 0 w_result [31:0] $end
-$var wire 1 1 w_done $end
-$var wire 1 2 w_burst_size $end
+$var wire 1 " bus_aquire $end
+$var wire 1 # bus_error $end
+$var wire 1 $ busy $end
+$var wire 8 % ciN [7:0] $end
+$var wire 1 & clock $end
+$var wire 32 ' in_data [31:0] $end
+$var wire 1 ( in_end $end
+$var wire 1 ) in_valid $end
+$var wire 1 * reset $end
+$var wire 1 + slave_busy $end
+$var wire 1 , start $end
+$var wire 32 - valueA [31:0] $end
+$var wire 32 . valueB [31:0] $end
+$var wire 32 / w_result [31:0] $end
+$var wire 1 0 w_done $end
+$var wire 8 1 w_burst_size [7:0] $end
+$var wire 1 2 read_n_write $end
 $var wire 32 3 newA [31:0] $end
-$var wire 1 4 end_transaction $end
-$var wire 1 5 enable_counters $end
-$var wire 1 6 dividedB $end
-$var wire 1 7 data_valid $end
-$var wire 1 8 bus_request $end
-$var wire 1 9 burst_reset $end
-$var wire 8 : burst_counter [7:0] $end
-$var wire 1 ; block_reset $end
-$var wire 8 < block_counter [7:0] $end
-$var wire 32 = address_data [31:0] $end
-$var reg 1 > aquired $end
-$var reg 10 ? block_size [9:0] $end
-$var reg 8 @ burst_size [7:0] $end
-$var reg 2 A control_reg [1:0] $end
-$var reg 32 B delayed_valueB [31:0] $end
-$var reg 1 C r_done $end
-$var reg 32 D r_result [31:0] $end
-$var reg 9 E start_address_bus [8:0] $end
-$var reg 9 F start_address_mem [8:0] $end
-$var reg 1 G started $end
-$var reg 3 H state [2:0] $end
-$var reg 2 I status_reg [1:0] $end
-$var reg 1 J writing $end
+$var wire 1 4 in_begin $end
+$var wire 1 5 end_transaction $end
+$var wire 1 6 enable_counters $end
+$var wire 1 7 dividedB $end
+$var wire 1 8 data_valid $end
+$var wire 1 9 bus_request $end
+$var wire 1 : burst_reset $end
+$var wire 8 ; burst_counter [7:0] $end
+$var wire 1 < block_reset $end
+$var wire 8 = block_counter [7:0] $end
+$var wire 1 4 begin_transaction $end
+$var wire 32 > address_data [31:0] $end
+$var reg 1 ? aquired $end
+$var reg 10 @ block_size [9:0] $end
+$var reg 8 A burst_size [7:0] $end
+$var reg 2 B control_reg [1:0] $end
+$var reg 32 C delayed_valueB [31:0] $end
+$var reg 1 D r_done $end
+$var reg 32 E r_result [31:0] $end
+$var reg 9 F start_address_bus [8:0] $end
+$var reg 9 G start_address_mem [8:0] $end
+$var reg 1 H started $end
+$var reg 3 I state [2:0] $end
+$var reg 2 J status_reg [1:0] $end
+$var reg 1 K writing $end
 $upscope $end
 $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
-xJ
-bx I
-b0 H
-xG
+xK
+bx J
+b0 I
+xH
+b0 G
 b0 F
-b0 E
-bx D
-xC
-b0x B
+bx E
+xD
+b0x C
+b0 B
 b0 A
 b0 @
-b0 ?
-x>
+x?
+bx >
 bx =
-bx <
-1;
-bx :
-19
+1<
+bx ;
+1:
+09
 08
-07
-x6
+x7
+06
 05
 04
 bx 3
 02
-x1
-bx 0
+b0 1
+x0
 bx /
 bx .
-0-
+bx -
 0,
-1+
-z*
+0+
+1*
 z)
-bx (
-0'
-bx &
-0%
+z(
+bx '
+0&
+bx %
 0$
 0#
-z"
+0"
 b1111 !
 $end
 #5
-01
-b0 0
-b0 <
-b0 :
-b0 B
-0J
-0C
-0>
-b0 I
-0G
-1'
-#10
-b0x B
-0'
-0+
-#15
-1'
-#20
-0'
-1-
-#25
-1G
-1'
-#30
-06
-b111000000000 3
-0'
-b1100 /
-b111000000000 .
-b1100 &
-0-
-#35
-b1100 ?
-1C
-1'
-#40
-b0 B
-16
-b1001000000000 3
-0'
-b1001000000000 .
-b11 /
-#45
-1'
-#50
-b1 B
-b1011000000000 3
-0'
-b1 /
-b1011000000000 .
-#55
-b1 A
-1'
-#60
-0'
-#65
-x6
-0;
-18
-b0 3
-1J
-b1 H
-1'
-#70
-b0x B
-0'
-#75
-1'
-#80
-0'
-1#
-#85
-08
+00
+b0 /
 b0 =
-1>
-b11 H
-11
-1'
-#90
-0'
-0#
-#95
-15
-09
-b10 H
-01
-1'
-#100
-0'
-#105
-14
-b1 3
-b1 <
-b1 :
-11
-1'
-#110
-0'
-#115
-b10 :
-b10 <
-05
-04
+b0 ;
+b0 C
+0K
+0D
+0?
+b0 J
+0H
+1&
+#10
+b0x C
+0&
+0*
+#15
+1&
+#20
+0&
+1,
+#25
+1H
+1&
+#30
+07
+b111000000000 3
+0&
+b1100 .
+b111000000000 -
+b1100 %
+0,
+#35
+b1100 @
+1D
+1&
+#40
+b0 C
+17
+b1001000000000 3
+0&
+b1001000000000 -
+b11 .
+#45
+b11 A
+1&
+#50
+b1 C
+b1011000000000 3
+0&
+b1 .
+b1011000000000 -
+#55
+b1 B
+1&
+#60
+0&
+#65
+b0 >
+x7
+0<
 19
 b0 3
-bx =
-18
-b1 H
-01
-1'
+1K
+b1 I
+1&
+#70
+b0x C
+0&
+#75
+1&
+#80
+0&
+1"
+#85
+09
+14
+b11 1
+1?
+b11 I
+10
+1&
+#90
+0&
+0"
+#95
+16
+0:
+04
+b0 1
+b10 I
+00
+1&
+#100
+0&
+#105
+b1 3
+b1 =
+b1 ;
+10
+1&
+#110
+0&
+#115
+b10 3
+b10 ;
+b10 =
+00
+1&
 #120
-0'
+0&
 #125
-b0 :
-11
-1'
+b11 3
+b11 =
+b11 ;
+10
+1&
 #130
-0'
+0&
 #135
-01
-1'
+15
+b100 3
+b100 ;
+b100 =
+00
+1&
 #140
-0'
+0&
 #145
-11
-1'
+b101 =
+b101 ;
+06
+05
+1:
+b0 3
+19
+10
+b1 I
+1&
 #150
-0'
+0&
 #155
-01
-1'
+b0 ;
+00
+1&
 #160
-0'
+0&
 #165
-11
-1'
+10
+1&
 #170
-0'
+0&
 #175
-01
-1'
+00
+1&
 #180
-0'
+0&
 #185
-11
-1'
+10
+1&
 #190
-0'
+0&

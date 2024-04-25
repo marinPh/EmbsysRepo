@@ -13,6 +13,7 @@ module newDMA #(parameter[7:0] customId = 8'h00)
                                     in_data,
                 input wire [ 7 : 0 ] ciN,
                 output wire [31:0] address_data,
+                output wire [7:0] w_burst_size,
                 output wire [3:0] BE,
                 output wire bus_request,
                 begin_transaction,
@@ -148,7 +149,7 @@ end
                     if (valueA[9] == 1'b1 ) begin
                         $display("writing to burst_size %d", valueB);
                         //if 9th is 1 write valueB to burst_size
-                        burst_size <= valueA[7:0];
+                        burst_size <= valueB[7:0];
                         r_done = 1;
                     end
                     else begin
@@ -229,9 +230,9 @@ assign newA = (state == 0) ? valueA : (state == 2) ? (writing == 1) ? start_addr
 //if status reg is 1 or valueA[12:10] is 0, set data_valid to w_done, rest is r_done
 assign data_valid = (state == 2  && writing==0)? 1'b1 : 1'b0;
 //enable counters if we are state 2 and writing is 1 and slave_busy ==0 or state2 writing is 0 and data_valid is 1
-assign enable_counters = ((state == 2 && writing && !slave_busy) || (state == 2 && !writing))? 1 : 0;
+assign enable_counters = ((state == 2 && writing && !slave_busy ) || (state == 2 && !writing && in_valid==1))? 1 : 0;
 // if state == 3 address, if state == 2 w_result else 0
-assign address_data =  (state == 3) ? (writing==1) ? start_address_bus:start_address_mem : (state == 2) ? w_result : r_result;
+assign address_data =  (state == 3) ? (writing==1) ? start_address_bus:start_address_mem : (state == 2) ? w_result :(state == 0) ? r_result : 0;
 assign bus_request = (state == 1 ) ? 1 : 0;
 assign end_transaction = (state == 2 && (burst_counter == burst_size +1 || block_counter == block_size || bus_error ==1)) ? 1 : 0;
 assign begin_transaction = (state == 3) ? 1 : 0;
