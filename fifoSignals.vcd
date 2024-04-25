@@ -1,5 +1,5 @@
 $date
-	Thu Apr 25 14:31:59 2024
+	Thu Apr 25 16:12:43 2024
 $end
 $version
 	Icarus Verilog
@@ -7,177 +7,245 @@ $end
 $timescale
 	1s
 $end
-$scope module tb_dmaController $end
+$scope module tb_new $end
 $scope module DUT $end
-$var wire 1 ! begin_transaction $end
-$var wire 1 " bus_aquire $end
-$var wire 1 # bus_error $end
-$var wire 8 $ ciN [7:0] $end
-$var wire 1 % clock $end
-$var wire 1 & in_valid $end
-$var wire 1 ' reset $end
-$var wire 1 ( slave_busy $end
-$var wire 1 ) start $end
-$var wire 32 * valueA [31:0] $end
-$var wire 32 + valueB [31:0] $end
-$var wire 32 , w_result [31:0] $end
-$var wire 1 - w_done $end
-$var wire 32 . result [31:0] $end
-$var wire 32 / newA [31:0] $end
-$var wire 1 0 gtg $end
-$var wire 1 1 end_transaction $end
-$var wire 1 2 data_valid $end
-$var wire 1 3 bus_request $end
-$var wire 1 4 burst_reset $end
-$var wire 8 5 burst_counter [7:0] $end
-$var reg 1 6 aquired $end
-$var reg 10 7 block_size [9:0] $end
-$var reg 8 8 burst_size [7:0] $end
-$var reg 2 9 control_reg [1:0] $end
-$var reg 32 : delayed_valueB [31:0] $end
-$var reg 1 ; r_done $end
-$var reg 32 < r_result [31:0] $end
-$var reg 9 = start_address_bus [8:0] $end
-$var reg 9 > start_address_mem [8:0] $end
-$var reg 1 ? started $end
-$var reg 2 @ status_reg [1:0] $end
-$var reg 1 A writing $end
+$var wire 4 ! BE [3:0] $end
+$var wire 1 " begin_transaction $end
+$var wire 1 # bus_aquire $end
+$var wire 1 $ bus_error $end
+$var wire 1 % busy $end
+$var wire 8 & ciN [7:0] $end
+$var wire 1 ' clock $end
+$var wire 1 " in_begin $end
+$var wire 32 ( in_data [31:0] $end
+$var wire 1 ) in_end $end
+$var wire 1 * in_valid $end
+$var wire 1 + reset $end
+$var wire 1 , slave_busy $end
+$var wire 1 - start $end
+$var wire 32 . valueA [31:0] $end
+$var wire 32 / valueB [31:0] $end
+$var wire 32 0 w_result [31:0] $end
+$var wire 1 1 w_done $end
+$var wire 1 2 w_burst_size $end
+$var wire 32 3 newA [31:0] $end
+$var wire 1 4 end_transaction $end
+$var wire 1 5 enable_counters $end
+$var wire 1 6 dividedB $end
+$var wire 1 7 data_valid $end
+$var wire 1 8 bus_request $end
+$var wire 1 9 burst_reset $end
+$var wire 8 : burst_counter [7:0] $end
+$var wire 1 ; block_reset $end
+$var wire 8 < block_counter [7:0] $end
+$var wire 32 = address_data [31:0] $end
+$var reg 1 > aquired $end
+$var reg 10 ? block_size [9:0] $end
+$var reg 8 @ burst_size [7:0] $end
+$var reg 2 A control_reg [1:0] $end
+$var reg 32 B delayed_valueB [31:0] $end
+$var reg 1 C r_done $end
+$var reg 32 D r_result [31:0] $end
+$var reg 9 E start_address_bus [8:0] $end
+$var reg 9 F start_address_mem [8:0] $end
+$var reg 1 G started $end
+$var reg 3 H state [2:0] $end
+$var reg 2 I status_reg [1:0] $end
+$var reg 1 J writing $end
 $upscope $end
 $upscope $end
 $enddefinitions $end
 #0
 $dumpvars
-xA
-bx @
-x?
-b0 >
-b0 =
+xJ
+bx I
+b0 H
+xG
+b0 F
+b0 E
+bx D
+xC
+b0x B
+b0 A
+b0 @
+b0 ?
+x>
+bx =
 bx <
-x;
+1;
 bx :
-b0 9
-b0 8
-b0 7
+19
+08
+07
 x6
-bx 5
-14
-03
-x2
-01
-x0
+05
+04
+bx 3
+02
+x1
+bx 0
 bx /
 bx .
-x-
-bx ,
-bx +
-bx *
-0)
-z(
-1'
-z&
+0-
+0,
+1+
+z*
+z)
+bx (
+0'
+bx &
 0%
-bx $
+0$
 0#
-0"
-z!
+z"
+b1111 !
 $end
 #5
-00
-02
-b0 .
-0-
-b0 ,
-b0 5
-b0 :
-0A
-0;
+01
+b0 0
 b0 <
-06
-b0 @
-0?
-1%
-#10
-bx :
-04
-0%
-1)
-0'
-#15
-1?
-1%
-#20
-b11 :
-b110000000000 /
-0%
-b1100 $
-b11 +
-b110000000000 *
-#25
-12
-1;
-1%
-#30
-b1 :
-b1011100000000 /
-0%
-b1 +
-b1011100000000 *
-0)
-#35
-13
-b1 9
-1%
-#40
 b0 :
-b1011000000000 /
-0%
-1"
-b0 +
-b1011000000000 *
-#45
-03
-b0 9
+b0 B
+0J
+0C
+0>
+b0 I
+0G
+1'
+#10
+b0x B
+0'
+0+
+#15
+1'
+#20
+0'
+1-
+#25
+1G
+1'
+#30
+06
+b111000000000 3
+0'
+b1100 /
+b111000000000 .
+b1100 &
+0-
+#35
+b1100 ?
+1C
+1'
+#40
+b0 B
 16
-1%
+b1001000000000 3
+0'
+b1001000000000 .
+b11 /
+#45
+1'
 #50
-0%
+b1 B
+b1011000000000 3
+0'
+b1 /
+b1011000000000 .
 #55
-1%
+b1 A
+1'
 #60
-0%
+0'
 #65
-1%
+x6
+0;
+18
+b0 3
+1J
+b1 H
+1'
 #70
-0%
+b0x B
+0'
 #75
-1%
+1'
 #80
-0%
+0'
+1#
 #85
-1%
+08
+b0 =
+1>
+b11 H
+11
+1'
 #90
-0%
+0'
+0#
 #95
-1%
+15
+09
+b10 H
+01
+1'
 #100
-0%
+0'
 #105
-1%
+14
+b1 3
+b1 <
+b1 :
+11
+1'
 #110
-0%
+0'
 #115
-1%
+b10 :
+b10 <
+05
+04
+19
+b0 3
+bx =
+18
+b1 H
+01
+1'
 #120
-0%
+0'
 #125
-1%
+b0 :
+11
+1'
 #130
-0%
+0'
 #135
-1%
+01
+1'
 #140
-0%
+0'
 #145
-1%
+11
+1'
 #150
-0%
+0'
+#155
+01
+1'
+#160
+0'
+#165
+11
+1'
+#170
+0'
+#175
+01
+1'
+#180
+0'
+#185
+11
+1'
+#190
+0'

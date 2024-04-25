@@ -18,6 +18,7 @@ module newDMA #(parameter[7:0] customId = 8'h00)
                 begin_transaction,
                  data_valid,busy,
                  end_transaction);
+                 reg [31:0] r_result;
                reg [31:0]delayed_valueB;
                reg [8:0]start_address_bus;
                 reg [8:0]start_address_mem;
@@ -82,6 +83,7 @@ end
         case(state)
         0: begin
             if (control_reg > 0) begin
+                $display("control_reg > 0");
                 state <= 1;
                 writing <= control_reg[0];
     
@@ -90,75 +92,85 @@ end
             else begin
             case(valueA[12:10])
                 3'b001 :begin 
-                    $display("case 1");
-                    if (valueA[9] == 1'b1 && status_reg == 0 ) begin
+                    
+                    if (valueA[9] == 1'b1 ) begin
                       //if 9th is 1 write valueB to start_address_bus
-                        start_address_bus <= valueB[31:0];
+                      $display("writing to start_address_bus %d", valueB);
+
+
+                        start_address_bus <= valueB[8:0];
                         r_done = 1;
                     end
                     else begin
+                        $display("reading from start_address_bus %d", start_address_bus);
                         //if 9th is 0 read from start_address_bus
-                        //r_result <= start_address_bus;
+                        r_result <= start_address_bus;
                         r_done = 1;
                     end
                 end
 
                 3'b010: begin
-                    $display("case 2");
                     //check if 9th bit is 1 or 0
-                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                    if (valueA[9] == 1'b1 ) begin
+                        $display("writing to start_address_mem %d", valueB);
                         //if 9th is 1 write valueB to start_address_mem
                         start_address_mem <= valueB[8:0];
                         r_done = 1;
                     end
                     else begin
+                        $display("reading from start_address_mem %d", start_address_mem);
                         //if 9th is 0 read from start_address_mem
-                        //r_result <= start_address_mem;
+                        r_result <= start_address_mem;
                         r_done = 1;
                     end
                 end
                 3'b011: begin
-                    $display("case 3");
+              
                  //check if 9th bit is 1 or 0
-                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                    if (valueA[9] == 1'b1) begin
                         //if 9th is 1 write valueB to block_size
+                        $display("writing to block_size %d", valueB);
                         block_size <= valueB[9:0];
                         r_done = 1;
                     end
                     else begin
                     
                         //if 9th is 0 read from burst_size
-                        //r_result <= block_size;
+                        $display("reading from block_size %d", block_size);
+                        r_result <= block_size;
                         r_done = 1;
                     end
 
                 end
                 3'b100: begin
-                    $display("case 4");
-                    //check if 9th bit is 1 or 0
-                    if (valueA[9] == 1'b1 && status_reg == 2'b0) begin
                 
+                    //check if 9th bit is 1 or 0
+                    if (valueA[9] == 1'b1 ) begin
+                        $display("writing to burst_size %d", valueB);
                         //if 9th is 1 write valueB to burst_size
                         burst_size <= valueA[7:0];
                         r_done = 1;
                     end
                     else begin
+                        $display("reading from burst_size %d", burst_size);
                         //if 9th is 0 read from burst_size
-                        //r_result <= burst_size;
+                        r_result <= burst_size;
                         r_done = 1;
                     end
                 end
                 3'b101: begin
-                    $display("case 5");
+                  
                     //check if 9th bit is 1 or 0
-                    if (valueA[9] == 1'b1 && status_reg == 0) begin
+                    if (valueA[9] == 1'b1 ) begin
+                        $display("writing to control_reg %d", valueB);
                         //if 9th is 1 write valueB to control_reg
                         control_reg <= valueB[1:0];
                         r_done = 1;
                     end
                     else begin
+                        $display("reading from status_reg %d", control_reg);
                         //if 9th is 0 read from control_reg
-                        //r_result <= status_reg;
+                        r_result <= status_reg;
                         r_done = 1;
                     end
                 end
@@ -184,14 +196,15 @@ end
                 status_reg <= 2;
                 state <= 0;
             end
-            else if (block_counter == block_size || in_end==1) begin
+            else if (block_counter == block_size ) begin
+                $display("block_counter == block_size, %d %d", block_counter, block_size);
+
                 state <= 0;
                 control_reg <= 0;
                 status_reg <= 0;
             end
-            else if(burst_counter == burst_size+1) begin
+            else if(burst_counter == burst_size+1 || in_end==1) begin
                 state = 1;
-       
                 status_reg <= 0;
         
             end
@@ -212,24 +225,21 @@ always @(negedge clock)
 assign dividedB = (state == 0) ? valueB : in_data;
 assign block_reset = (state == 0) ? 1 : 0;
 assign burst_reset = (state != 2) ? 1 : 0;
-
 assign newA = (state == 0) ? valueA : (state == 2) ? (writing == 1) ? start_address_bus + block_counter : start_address_mem + block_counter: 0;
 //if status reg is 1 or valueA[12:10] is 0, set data_valid to w_done, rest is r_done
 assign data_valid = (state == 2  && writing==0)? 1'b1 : 1'b0;
 //enable counters if we are state 2 and writing is 1 and slave_busy ==0 or state2 writing is 0 and data_valid is 1
-assign enable_counters = (state == 2 && writing && !slave_busy) || (state == 2 && !writing)? 1 : 0;
+assign enable_counters = ((state == 2 && writing && !slave_busy) || (state == 2 && !writing))? 1 : 0;
 // if state == 3 address, if state == 2 w_result else 0
-assign address_data =  (state == 3) ? (writing==1) ? start_address_bus:start_address_mem : (state == 2) ? w_result : 0;
+assign address_data =  (state == 3) ? (writing==1) ? start_address_bus:start_address_mem : (state == 2) ? w_result : r_result;
 assign bus_request = (state == 1 ) ? 1 : 0;
-assign end_transaction = (state == 2 && burst_counter == burst_size +1 || block_counter == block_size || bus_error ==1) ? 1 : 0;
-//TODO: find a combination for end_transaction and start transaction
+assign end_transaction = (state == 2 && (burst_counter == burst_size +1 || block_counter == block_size || bus_error ==1)) ? 1 : 0;
+assign begin_transaction = (state == 3) ? 1 : 0;
 //w_burst_size is burst_size when begin transaction is 1 else 0
 assign w_burst_size = (state ==3) ? burst_size : 0;
+assign read_n_write = (state == 3 && writing == 0) ? 1 : 0;
 assign BE = 4'hF;
 assign busy = 0;
-
-
-
 
 
 // init ramModule

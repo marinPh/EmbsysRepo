@@ -18,10 +18,11 @@ module tb_new;
     wire data_valid;
     wire busy;
     wire end_transaction;
-    wire slave_busy;
+
     wire in_valid;
     reg bus_aquire =0;
     reg [31:0] in_data;
+    reg slave_busy = 0;
 
   
   
@@ -33,7 +34,7 @@ module tb_new;
         .bus_aquire(bus_aquire),
         .in_valid(in_valid),
         .slave_busy(slave_busy),
-        .in_end(end_transaction),
+        .in_end(in_end),
         .in_begin(begin_transaction),
         .valueA(valueA),
         .valueB(valueB),
@@ -64,6 +65,31 @@ module tb_new;
         reset = 1;
         #10;
         reset = 0;
+        #10;
+        start = 1;
+        #10;
+        start = 0;
+        ciN = 8'd12;
+        //bit 12 = 1 and bit 9 = 1
+
+        valueA = 32'hE00;
+        $display("valueA = %b", valueA[12:9]);
+        valueB = 32'hc;
+        #10;
+        valueB = 32'h3;
+        valueA = 32'h1200;
+        #10 
+        //set control reg to 1
+        valueA = 32'h1600;
+        valueB = 32'h1;
+        #30
+         $display("valueA = %b", valueA[12:9]);
+        bus_aquire = 1;
+        #10; 
+        bus_aquire = 0;
+        
+
+
         #100;
         $finish;
     end
