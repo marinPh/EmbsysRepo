@@ -465,6 +465,12 @@ module or1420SingleCore ( input wire         clock12MHz,
                        .result(s_grayResult) );
   
   //custom memory
+  wire        s_cidmaRequestBus, s_cidmaBusgranted, s_cidmaBeginTransaction;
+  wire        s_cidmaEndTransaction, s_cidmaDataValid, s_cidmaReadNotWrite;
+  wire [3:0]  s_cidmaByteEnables;
+  wire [7:0]  s_cidmaBurstSize;
+  wire [31:0] s_cidmaAddressData;
+
   ramDmaCi #(.customInstructionId(8'd14)) mymem
             (.clock(s_systemClock),
              .reset(s_cpuReset),
@@ -473,17 +479,24 @@ module or1420SingleCore ( input wire         clock12MHz,
              .ciValueA(s_cpu1CiDataA),
              .ciValueB(s_cpu1CiDataB),
              .ciDone(s_testCiDone),
-             .ciResult(s_testResult));
-  
-    /*test #(.customInstructionId(8'd15) ) delayCC
-            (.clock(s_systemClock),
-             .reset(s_cpuReset),
-             .ciStart(s_cpu1CiStart),
-             .ciN(s_cpu1CiN),
-             .ciValueA(s_cpu1CiDataA),
-             .ciValueB(s_cpu1CiDataB),
-             .ciDone(s_testCiDone),
-             .ciResult(s_testResult));*/
+             .ciResult(s_testResult),
+
+             .requestTransaction(s_cidmaRequestBus),
+             .transactionGranted(s_cidmaBusgranted),
+             .endTransactionIn(s_endTransaction),
+             .dataValidIn(s_dataValid),
+             .busErrorIn(s_busError),
+             .addressDataIn(s_addressData),
+
+             //.beginTransactionIn(s_cidmaBeginTransaction),
+             .beginTransactionOut(s_cidmaBeginTransaction),
+             .endTransactionOut(s_cidmaEndTransaction),
+             .readNotWriteOut(s_cidmaReadNotWrite),
+             .byteEnablesOut(s_cidmaByteEnables),
+             .burstSizeOut(s_cidmaBurstSize),
+             .addressDataOut(s_cidmaAddressData));
+
+
 
   /*
    *
@@ -659,13 +672,15 @@ module or1420SingleCore ( input wire         clock12MHz,
  assign s_busRequests[31] = s_cpu1DcacheRequestBus;
  assign s_busRequests[30] = s_cpu1IcacheRequestBus;
  assign s_busRequests[29] = s_hdmiRequestBus;
- assign s_busRequests[28] =  s_camReqBus;
- assign s_busRequests[27:0] = 29'd0;
+ assign s_busRequests[28] = s_camReqBus;
+ assign s_busRequests[27] = s_cidmaRequestBus;
+ assign s_busRequests[26:0] = 28'd0;
  
  assign s_cpu1DcacheBusAccessGranted = s_busGrants[31];
  assign s_cpu1IcacheBusAccessGranted = s_busGrants[30];
  assign s_hdmiBusgranted             = s_busGrants[29];
  assign s_camAckBus                  = s_busGrants[28];
+ assign s_cidmaBusgranted            = s_busGrants[27];
 
  busArbiter arbiter ( .clock(s_systemClock),
                       .reset(s_reset),
@@ -687,16 +702,16 @@ module or1420SingleCore ( input wire         clock12MHz,
    *
    */
  assign s_busError         = s_arbBusError | s_biosBusError | s_uartBusError | s_sdramBusError | s_flashBusError;
- assign s_beginTransaction = s_cpu1BeginTransaction | s_hdmiBeginTransaction | s_camBeginTransaction;
+ assign s_beginTransaction = s_cpu1BeginTransaction | s_hdmiBeginTransaction | s_camBeginTransaction | s_cidmaBeginTransaction;
  assign s_endTransaction   = s_cpu1EndTransaction | s_arbEndTransaction | s_biosEndTransaction | s_uartEndTransaction |
-                             s_sdramEndTransaction | s_hdmiEndTransaction | s_flashEndTransaction | s_camEndTransaction;
+                             s_sdramEndTransaction | s_hdmiEndTransaction | s_flashEndTransaction | s_camEndTransaction | s_cidmaEndTransaction;
  assign s_addressData      = s_cpu1AddressData | s_biosAddressData | s_uartAddressData | s_sdramAddressData | s_hdmiAddressData |
-                             s_flashAddressData | s_camAddressData;
- assign s_byteEnables      = s_cpu1byteEnables | s_hdmiByteEnables | s_camByteEnables;
- assign s_readNotWrite     = s_cpu1ReadNotWrite | s_hdmiReadNotWrite;
+                             s_flashAddressData | s_camAddressData | s_cidmaAddressData;
+ assign s_byteEnables      = s_cpu1byteEnables | s_hdmiByteEnables | s_camByteEnables | s_cidmaByteEnables;
+ assign s_readNotWrite     = s_cpu1ReadNotWrite | s_hdmiReadNotWrite | s_cidmaReadNotWrite;
  assign s_dataValid        = s_cpu1DataValid | s_biosDataValid | s_uartDataValid | s_sdramDataValid | s_hdmiDataValid | 
-                             s_flashDataValid | s_camDataValid;
+                             s_flashDataValid | s_camDataValid | s_cidmaDataValid;
  assign s_busy             = s_sdramBusy;
- assign s_burstSize        = s_cpu1BurstSize | s_hdmiBurstSize | s_camBurstSize;
+ assign s_burstSize        = s_cpu1BurstSize | s_hdmiBurstSize | s_camBurstSize | s_cidmaBurstSize;
  
 endmodule
