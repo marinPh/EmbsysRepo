@@ -110,7 +110,7 @@ int main ()
   }
 
   //now do DMA to bus
-  setDmaParams(&testdest + 4, 20, 32, 15);
+  setDmaParams(&testdest[0] + 4, 20, 32, 15);
   printf("[+] Saving ciMem data to ram!\n");
   startDmaWrite();
   printf("[+] Status reg: %d\n", getDmaStatus());
