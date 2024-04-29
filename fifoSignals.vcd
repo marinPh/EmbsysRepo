@@ -1,0 +1,611 @@
+$date
+	Mon Apr 29 21:29:56 2024
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module tb_dmaController $end
+$scope module DUT $end
+$var wire 32 ! addressDataIn [31:0] $end
+$var wire 32 " addressDataOut [31:0] $end
+$var wire 1 # beginTransactionIn $end
+$var wire 9 $ bufferAddress [8:0] $end
+$var wire 32 % bufferDataIn [31:0] $end
+$var wire 8 & burstSizeIn [7:0] $end
+$var wire 1 ' busErrorIn $end
+$var wire 1 ( busyIn $end
+$var wire 4 ) byteEnablesIn [3:0] $end
+$var wire 1 * ciDone $end
+$var wire 8 + ciN [7:0] $end
+$var wire 1 , ciStart $end
+$var wire 32 - ciValueA [31:0] $end
+$var wire 32 . ciValueB [31:0] $end
+$var wire 1 / clock $end
+$var wire 1 0 dataValidIn $end
+$var wire 1 1 endTransactionIn $end
+$var wire 1 2 readNotWriteIn $end
+$var wire 1 3 reset $end
+$var wire 1 4 s_startTransfer $end
+$var wire 1 5 transactionGranted $end
+$var wire 1 6 validReadOp $end
+$var wire 1 7 writeEnableA $end
+$var wire 1 8 writeEnableCPU $end
+$var wire 1 9 s_doneNext $end
+$var wire 1 : s_delayCountZero $end
+$var wire 1 ; s_delayCountOne $end
+$var wire 32 < s_delayCountNext [31:0] $end
+$var wire 1 = requestTransaction $end
+$var wire 22 > memoryOp [21:0] $end
+$var wire 1 ? isMyCi $end
+$var wire 32 @ dataOutA [31:0] $end
+$var wire 32 A ciResult [31:0] $end
+$var wire 1 B bufferWe $end
+$var wire 32 C bufferDataOut [31:0] $end
+$var wire 9 D addressCPU [8:0] $end
+$var reg 1 E beginTransactionOut $end
+$var reg 10 F blockSize [9:0] $end
+$var reg 8 G burstCountReg [7:0] $end
+$var reg 8 H burstSize [7:0] $end
+$var reg 8 I burstSizeOut [7:0] $end
+$var reg 32 J busStartAddress [31:0] $end
+$var reg 4 K byteEnablesOut [3:0] $end
+$var reg 32 L dataOutCPU [31:0] $end
+$var reg 1 M dataValidOutReg $end
+$var reg 1 N doWrite $end
+$var reg 1 O endTransactionReg $end
+$var reg 9 P memoryStartAddress [8:0] $end
+$var reg 8 Q nextBurstSize [7:0] $end
+$var reg 1 R readNotWriteOut $end
+$var reg 10 S remainingBlockSize [9:0] $end
+$var reg 9 T s_bufferAddressReg [8:0] $end
+$var reg 32 U s_busAddressReg [31:0] $end
+$var reg 32 V s_busDataInReg [31:0] $end
+$var reg 1 W s_busDataInValidReg $end
+$var reg 32 X s_busDataOutReg [31:0] $end
+$var reg 32 Y s_delayCountReg [31:0] $end
+$var reg 4 Z s_dmaState [3:0] $end
+$var reg 4 [ s_dmaStateNext [3:0] $end
+$var reg 1 \ s_doneReg $end
+$var reg 1 ] s_endTransactionInReg $end
+$var reg 1 ^ startTransactionOutReg $end
+$var reg 2 _ status [1:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+bx _
+x^
+x]
+x\
+b0 [
+bx Z
+bx Y
+bx X
+xW
+bx V
+bx U
+bx T
+bx S
+xR
+bx Q
+bx P
+xO
+xN
+xM
+bx L
+bx K
+bx J
+bx I
+bx H
+bx G
+bx F
+xE
+bx D
+bx C
+xB
+bx A
+bx @
+0?
+bx >
+x=
+b0 <
+x;
+x:
+x9
+x8
+07
+06
+05
+04
+13
+z2
+01
+10
+0/
+bx .
+bx -
+0,
+b0 +
+x*
+bz )
+0(
+0'
+bz &
+bx %
+bx $
+z#
+bx "
+bz !
+$end
+#5
+09
+1:
+0;
+0=
+0B
+b0 J
+b0 Y
+0]
+1W
+bz %
+bz V
+b0 U
+b0 $
+b0 T
+b0 Q
+b0 S
+b0 Z
+bx0xxx0xxx0xxx0xxx0xxx0xxx0xxx0 A
+b11101110111011101110111011101110 L
+0N
+b0 H
+b0 F
+b0 P
+1/
+#10
+b0xx [
+x4
+x9
+b0x <
+x7
+x6
+1?
+0/
+b1100 +
+1,
+03
+#15
+b0 [
+bx <
+x=
+x:
+x;
+bx0 _
+0^
+b0 I
+0R
+b0 K
+0O
+0M
+0E
+b0 "
+b0 X
+b0xx Z
+b0x Y
+1/
+#20
+06
+04
+b0 A
+1*
+07
+b0 L
+b11 >
+18
+b0 D
+0/
+b10101 .
+b111000000000 -
+#25
+b0x0x0x A
+b10101 L
+0=
+b10101 F
+bx Y
+bx _
+x^
+xR
+bx K
+xE
+b0 Z
+1/
+#30
+b0 A
+b0 L
+b100 >
+0/
+b101 .
+b1001000000000 -
+#35
+b0x0x A
+b101 L
+bx0 _
+0^
+0R
+b0 K
+0E
+b101 H
+1/
+#40
+b11 [
+14
+b0x0 A
+b0x0 L
+b101 >
+b100000000 D
+0/
+b10 .
+b1011100000000 -
+#45
+b1 [
+04
+1N
+b10101 S
+b11 Z
+1/
+#50
+b1 <
+16
+bx A
+x*
+19
+bx L
+b0 >
+08
+b0 D
+0/
+15
+b0 .
+b0 -
+#55
+b10 [
+1=
+1*
+0:
+1;
+bx1 _
+b11111111 G
+b101 Q
+b1111 S
+b1 Z
+1\
+b1 Y
+1/
+#60
+b0 <
+06
+0?
+0/
+0,
+#65
+b111 [
+09
+b0 <
+1:
+0;
+0=
+b0 Y
+bx0 _
+b10 Z
+1/
+#70
+0/
+#75
+b1000 [
+b0 A
+0*
+b1 _
+1^
+b101 I
+b1111 K
+1E
+b111 Z
+0\
+1/
+#80
+0/
+#85
+b11 [
+0^
+b0 I
+b0 K
+1M
+0E
+bx "
+bx X
+b100 U
+b1 $
+b1 T
+b11111110 G
+b1000 Z
+1/
+#90
+0/
+#95
+b1 [
+b0 _
+1O
+0M
+b0 "
+b0 X
+b11 Z
+1/
+#100
+0/
+#105
+b10 [
+1=
+b1 _
+0O
+b100 G
+b1001 S
+b1 Z
+1/
+#110
+0/
+#115
+b111 [
+0=
+b0 _
+b10 Z
+1/
+#120
+0/
+#125
+b1 _
+1^
+b101 I
+b1111 K
+1E
+b100 "
+b100 X
+b111 Z
+1/
+#130
+0/
+#135
+0^
+b0 I
+b0 K
+1M
+0E
+bx "
+bx X
+b1000 U
+b10 $
+b10 T
+b11 G
+1/
+#140
+0/
+#145
+b1100 U
+b11 $
+b11 T
+b10 G
+1/
+#150
+0/
+#155
+b10000 U
+b100 $
+b100 T
+b1 G
+1/
+#160
+0/
+#165
+b10100 U
+b101 $
+b101 T
+b0 G
+1/
+#170
+0/
+#175
+b1000 [
+b11000 U
+b110 $
+b110 T
+b11111111 G
+1/
+#180
+0/
+#185
+b11 [
+b11100 U
+b111 $
+b111 T
+b11111110 G
+b1000 Z
+1/
+#190
+0/
+#195
+b1 [
+b0 _
+1O
+0M
+b0 "
+b0 X
+b11 Z
+1/
+#200
+0/
+#205
+b10 [
+1=
+b1 _
+0O
+b100 G
+b11 S
+b1 Z
+1/
+#210
+0/
+#215
+b111 [
+0=
+b0 _
+b10 Z
+1/
+#220
+0/
+#225
+b1 _
+1^
+b101 I
+b1111 K
+1E
+b11100 "
+b11100 X
+b111 Z
+1/
+#230
+0/
+#235
+0^
+b0 I
+b0 K
+1M
+0E
+bx "
+bx X
+b100000 U
+b1000 $
+b1000 T
+b11 G
+1/
+#240
+0/
+#245
+b100100 U
+b1001 $
+b1001 T
+b10 G
+1/
+#250
+0/
+#255
+b101000 U
+b1010 $
+b1010 T
+b1 G
+1/
+#260
+0/
+#265
+b101100 U
+b1011 $
+b1011 T
+b0 G
+1/
+#270
+0/
+#275
+b1000 [
+b110000 U
+b1100 $
+b1100 T
+b11111111 G
+1/
+#280
+0/
+#285
+b11 [
+b110100 U
+b1101 $
+b1101 T
+b11111110 G
+b1000 Z
+1/
+#290
+0/
+#295
+b1 [
+b0 _
+1O
+0M
+b0 "
+b0 X
+b11 Z
+1/
+#300
+0/
+#305
+b10 [
+1=
+b1 _
+0O
+b100 G
+b11 Q
+b0 S
+b1 Z
+1/
+#310
+0/
+#315
+b111 [
+0=
+b0 _
+b10 Z
+1/
+#320
+0/
+#325
+b1 _
+1^
+b11 I
+b1111 K
+1E
+b110100 "
+b110100 X
+b111 Z
+1/
+#330
+0/
+#335
+0^
+b0 I
+b0 K
+1M
+0E
+bx "
+bx X
+b111000 U
+b1110 $
+b1110 T
+b11 G
+1/
+#340
+0/
+#345
+b111100 U
+b1111 $
+b1111 T
+b10 G
+1/
+#350
+0/
+#355
+b1000000 U
+b10000 $
+b10000 T
+b1 G
+1/
+#360
+0/

@@ -28,6 +28,7 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
                   output reg         readNotWriteOut,
                                      startTransactionOutReg,
                                      endTransactionReg,
+                                     beginTransactionOut,
                                      dataValidOutReg,
                   output reg [3:0]   byteEnablesOut,
                   output reg [7:0]   burstSizeOut,
@@ -56,6 +57,7 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
 
     //write values to operation registers
     always @ (posedge clock) begin
+
       if (reset) begin
         busStartAddress <= 32'b0;
         memoryStartAddress = 9'b0;
@@ -70,6 +72,8 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
         doWrite <=  (memoryOp != OP_CONTROL) ? doWrite :
                     (ciValueB[0] == 1'b1) ? 1'b0 :
                     (ciValueB[1] == 1'b1) ? 1'b1 : 1'b0;
+                    
+                
       end
     end
 
@@ -215,6 +219,7 @@ module ramDmaCi #(  parameter [7:0] customInstructionId = 8'd0 )
                                   ((s_dmaState == WRITE) && (busyIn == 1'b0)) ? s_busAddressReg + 32'd4 : s_busAddressReg;
       s_busDataOutReg          <= (s_dmaState == INIT) ? s_busAddressReg :
                                   (s_dmaState == WRITE) ? bufferDataOut : 32'd0;
+      beginTransactionOut    <= (s_dmaState == INIT) ? 1'b1 : 1'b0;
       dataValidOutReg          <= (s_dmaState == WRITE) ? 1'b1 : 1'b0;
       endTransactionReg        <= ((s_dmaState == WRITE_DONE_OK) || (s_dmaState == WRITE_DONE_ERR)) ? 1'b1 : 1'b0;
       byteEnablesOut           <= (s_dmaState == INIT) ? 4'hF : 4'd0;
