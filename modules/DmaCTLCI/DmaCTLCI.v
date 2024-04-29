@@ -83,14 +83,12 @@ end
         if(bus_aquire == 1) begin
             aquired <= 1;
         end
-
         if(status_reg == 0 && control_reg ==1 && aquired == 1) begin
             $display("status reg set");
             status_reg =1;
             writing = control_reg[0];
             control_reg = 0;
         end
-
         if(status_reg == 1)begin
             if (burst_counter < block_size) begin
                 r_done = 0;
@@ -103,9 +101,7 @@ end
             end
         end
         $display("valueA[12:10] %b", valueA[12:10]);
-          
             case(valueA[12:10])
-
                 3'b001 :begin 
                     $display("case 1");
                     if (valueA[9] == 1'b1 && status_reg == 0 ) begin
@@ -119,7 +115,6 @@ end
                         r_done = 1;
                     end
                 end
-
                 3'b010: begin
                     $display("case 2");
                     //check if 9th bit is 1 or 0
