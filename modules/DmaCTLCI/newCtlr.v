@@ -144,7 +144,6 @@ end
 
                 end
                 3'b100: begin
-                
                     //check if 9th bit is 1 or 0
                     if (valueA[9] == 1'b1 ) begin
                         $display("writing to burst_size %d", valueB);
@@ -241,7 +240,6 @@ assign w_burst_size = (state ==3) ? burst_size : 0;
 assign read_n_write = (state == 3 && writing == 0) ? 1 : 0;
 assign BE = 4'hF;
 assign busy = 0;
-
 
 // init ramModule
   ramDmaCi #( customId ) DUT
