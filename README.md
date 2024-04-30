@@ -1,26 +1,11 @@
-Part 2 of PW2
+PW 4
 
-A new module implementing the custom instruction was created in ./modules/to_grayscale/toGrayscale.v. It implements the required transformation by replacing multiplications with shifts and adds, like you do on paper with partial products.
+A new module implementing the custom instruction was created in ./modules/ramDmaCi/ramDmaCi.v. The attached memory sits in dualPortSSRAM.v in the same directory. It closely resembles the one presented in the course.
 
-As1: The original variant needed 30.6 M cpu cycles, 19 M of which the CPU was stalled and ~17 M the bus was idle.
+The DMA controller is defined in ramDmaCi.v. Reading from the bus to the ci ram works, writing to the bus works sometimes but most of the time it deadlocks the fpga.
+Its implementation is based on the "camera" module and the hdmi "graphics controller".
 
-As2: A new executable was created under .programs/grayscale_accelerated to use this custom instruction.
-
-As3: The elapsed cycles dropped to 24.5 M, 18.3 M stalled and for 11.5 M the bus was idle.
-
-As4: You can see a comparison below:
-![alt text](./assets/cc.png)
-
-The camera takes pictures with a resolution of 640 * 480 = 307200 pixels, and the program processes each of them inside 2 nested loops, the outer for line, the inner for column.
-
-Disassembling the original program we can see the inner loop executing 33 instructions, most of them adds and shifts.
-![alt text](./assets/original_cfg.png)
-
-The accelerated version, however, has 17 instructions less, those arithmetic and logic needed to convert to grayscale.
-![alt text](./assets/accelerated_cfg.png)
-
-Assuming 1 instruction per cycle it saves 17 * 640 * 480 = 5222400 fetches, decodes and executes. Comparing the numbers above 30.6 M - 24.5 M is indeed around 5 M. The stalled count didn't drop that much because adds and shifts execute in 1CC, and the bus is idle when the CPU does math (it does not read any data from DRAM or camera), and the same 5M CC difference is observed.
-
+A program to test the functionality was made in ./programms/memtest_dma. It implements 2 buffers residing in ram, as well as some operations with the custom Ci.
 
 
 
