@@ -33,6 +33,7 @@ int main()
   int16_t *address1 = (int16_t *)&buffer1[0];
   int16_t *address2 = (int16_t *)&buffer2[0];
   int16_t *currentAddress1 = address1;
+  int16_t *currentAddress2 = address2;
   // init ram
   for (int i = 0; i < 512; i++)
   {
@@ -72,8 +73,13 @@ int main()
     for (int i = 1; i < 600; i++)
     {
       currentAddress1 = (currentAddress1 == address1) ? address2 : address1;
+      currentAddress2 = (currentAddress2 == address1) ? address2 : address1;
+
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress1));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress2));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
+
     }
     asm volatile("l.nios_rrr %[out1],r0,%[in2],0xC" : [out1] "=r"(cycles) : [in2] "r"(1 << 8 | 7 << 4));
     asm volatile("l.nios_rrr %[out1],%[in1],%[in2],0xC" : [out1] "=r"(stall) : [in1] "r"(1), [in2] "r"(1 << 9));
