@@ -20,7 +20,7 @@ int main()
   const uint32_t statusControl = 5 << 10;
   const uint32_t usedCiRamAddress = 50;
   const uint32_t usedBlocksize = 512;
-  const uint32_t usedBurstSize = 25;
+  const uint32_t usedBurstSize = 16;
   volatile uint16_t rgb565[640 * 480];
   volatile uint8_t grayscale[640 * 480];
   volatile uint32_t result, cycles, stall, idle;
