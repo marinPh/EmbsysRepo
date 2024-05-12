@@ -31,9 +31,9 @@ int main()
   int8_t buffer2[512];
 
   int16_t *address1 = (int16_t *)&buffer1[0];
-  int16_t *address2 = (int16_t *)&buffer2[0];
+  int8_t *address2 = (int8_t *)&buffer2[0];
   int16_t *currentAddress1 = address1;
-  int16_t *currentAddress2 = address2;
+  int8_t *currentAddress2 = address2;
   // init ram
   for (int i = 0; i < 512; i++)
   {
@@ -57,6 +57,8 @@ int main()
   uint32_t grayPixels;
   vga[2] = swap_u32(2);
   vga[3] = swap_u32((uint32_t)&grayscale[0]);
+  int currentStat = 0;
+  
   while (1)
   {
     uint32_t *gray = (uint32_t *)&grayscale[0];
@@ -69,16 +71,17 @@ int main()
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(blockSize | writeBit), [in2] "r"(usedBlocksize));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(burstSize | writeBit), [in2] "r"(usedBurstSize));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
-
+    currentStat++;
     for (int i = 1; i < 600; i++)
     {
-      
+      currentStat = i % 2 +1;
+
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress1));
-      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(currentStat));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress+256));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress2));
-      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(currentStat));
 
     }
     asm volatile("l.nios_rrr %[out1],r0,%[in2],0xC" : [out1] "=r"(cycles) : [in2] "r"(1 << 8 | 7 << 4));
