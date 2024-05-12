@@ -27,6 +27,9 @@ module or1420SingleCore ( input wire         clock12MHz,
                                              horizontalSync,
                                              verticalSync,
                                              activePixel,
+
+                          input wire [7:0]   dipSwitch,
+                          output wire [23:0] sevenSegments,
 `ifdef GECKO5Education
                           output wire [4:0]  hdmiRed,
                                              hdmiBlue,
@@ -312,22 +315,23 @@ module or1420SingleCore ( input wire         clock12MHz,
    * Here we instantiate the CPU
    *
    */
-  wire [31:0] s_cpu1CiResult, s_profileResult, s_grayResult, s_mymemResult;
-  wire [31:0] s_cpu1CiDataA, s_cpu1CiDataB, s_camCiResult, s_delayResult, s_testResult;
+  wire [31:0] s_cpu1CiResult, s_profileResult, s_grayResult, s_ramDmaResult;
+  wire [31:0] s_cpu1CiDataA, s_cpu1CiDataB, s_camCiResult, s_delayResult;
   wire [7:0]  s_cpu1CiN;
   wire        s_cpu1CiRa, s_cpu1CiRb, s_cpu1CiRc, s_cpu1CiStart, s_cpu1CiCke, s_cpu1CiDone, s_i2cCiDone, s_delayCiDone;
   wire [4:0]  s_cpu1CiA, s_cpu1CiB, s_cpu1CiC;
-  wire        s_cpu1IcacheRequestBus, s_cpu1DcacheRequestBus, s_camCiDone;
+  wire        s_cpu1IcacheRequestBus, s_cpu1DcacheRequestBus, s_camCiDone, s_ramDmaDone;
   wire        s_cpu1IcacheBusAccessGranted, s_cpu1DcacheBusAccessGranted;
   wire        s_cpu1BeginTransaction, s_cpu1EndTransaction, s_cpu1ReadNotWrite;
   wire [31:0] s_cpu1AddressData, s_i2cCiResult;
   wire [3:0]  s_cpu1byteEnables;
   wire        s_cpu1DataValid;
   wire [7:0]  s_cpu1BurstSize;
-  wire        s_spm1Irq, s_profileDone, s_stall, s_grayDone, s_mymemDone, s_testCiDone;
+  wire        s_spm1Irq, s_profileDone, s_stall, s_grayDone;
   
-  assign s_cpu1CiDone = s_hdmiDone | s_swapByteDone | s_flashDone | s_cpuFreqDone | s_i2cCiDone | s_delayCiDone | s_camCiDone | s_profileDone | s_grayDone | s_mymemDone | s_testCiDone;
-  assign s_cpu1CiResult = s_hdmiResult | s_swapByteResult | s_flashResult | s_cpuFreqResult | s_i2cCiResult | s_camCiResult | s_delayResult | s_profileResult | s_grayResult | s_mymemResult | s_testResult; 
+  assign s_cpu1CiDone = s_hdmiDone | s_swapByteDone | s_flashDone | s_cpuFreqDone | s_i2cCiDone | s_delayCiDone | s_camCiDone | s_profileDone | s_grayDone | s_ramDmaDone;
+  assign s_cpu1CiResult = s_hdmiResult | s_swapByteResult | s_flashResult | s_cpuFreqResult | s_i2cCiResult | s_camCiResult | s_delayResult | s_profileResult | s_grayResult |
+                          s_ramDmaResult; 
 
   or1420Top #( .NOP_INSTRUCTION(32'h1500FFFF)) cpu1
              (.cpuClock(s_systemClock),
@@ -464,39 +468,69 @@ module or1420SingleCore ( input wire         clock12MHz,
                        .done(s_grayDone),
                        .result(s_grayResult) );
   
-  //custom memory
-  wire        s_cidmaRequestBus, s_cidmaBusgranted, s_cidmaBeginTransaction;
-  wire        s_cidmaEndTransaction, s_cidmaDataValid, s_cidmaReadNotWrite;
-  wire [3:0]  s_cidmaByteEnables;
-  wire [7:0]  s_cidmaBurstSize;
-  wire [31:0] s_cidmaAddressData;
-
-  ramDmaCi #(.customInstructionId(8'd14)) mymem
-            (.clock(s_systemClock),
+  /*
+   *
+   * The RAM-DMA ISE
+   *
+   */
+  wire s_ramDmaRequest, s_ramDmaGranted, s_ramDmaBeginTransaction, s_ramDmaReadNotWrite;
+  wire s_ramDmaEndTransaction, s_ramDmaDataValid;
+  wire [3:0] s_ramDmaByteEnables;
+  wire [7:0] s_ramDmaBurstSize;
+  wire [31:0] s_ramDmaAddressData;
+  
+  ramDmaCi #(.customId(8'd20) ) ramDma
+            (.start(s_cpu1CiStart),
+             .clock(s_systemClock),
              .reset(s_cpuReset),
-             .ciStart(s_cpu1CiStart),
+             .valueA(s_cpu1CiDataA),
+             .valueB(s_cpu1CiDataB),
              .ciN(s_cpu1CiN),
-             .ciValueA(s_cpu1CiDataA),
-             .ciValueB(s_cpu1CiDataB),
-             .ciDone(s_testCiDone),
-             .ciResult(s_testResult),
-
-             .requestTransaction(s_cidmaRequestBus),
-             .transactionGranted(s_cidmaBusgranted),
+             .done(s_ramDmaDone),
+             .result(s_ramDmaResult),
+             .requestTransaction(s_ramDmaRequest),
+             .transactionGranted(s_ramDmaGranted),
              .endTransactionIn(s_endTransaction),
              .dataValidIn(s_dataValid),
              .busErrorIn(s_busError),
+             .busyIn(s_busy),
              .addressDataIn(s_addressData),
+             .beginTransactionOut(s_ramDmaBeginTransaction),
+             .readNotWriteOut(s_ramDmaReadNotWrite),
+             .endTransactionOut(s_ramDmaEndTransaction),
+             .dataValidOut(s_ramDmaDataValid),
+             .byteEnablesOut(s_ramDmaByteEnables),
+             .burstSizeOut(s_ramDmaBurstSize),
+             .addressDataOut(s_ramDmaAddressData));
 
-             //.beginTransactionIn(s_cidmaBeginTransaction),
-             .beginTransactionOut(s_cidmaBeginTransaction),
-             .endTransactionOut(s_cidmaEndTransaction),
-             .readNotWriteOut(s_cidmaReadNotWrite),
-             .byteEnablesOut(s_cidmaByteEnables),
-             .burstSizeOut(s_cidmaBurstSize),
-             .addressDataOut(s_cidmaAddressData));
-
-
+  /*
+   *
+   * Here the GPIO module is mapped
+   *
+   */
+  wire sGpioEndTransaction, sGpioDataValid, sGpioBusError;
+  wire [31:0] sGpioAddressData;
+  
+  gpio #(.nrOfInputs(8),
+         .nrOfOutputs(24),
+         .Base(32'h40000000)) sevenSegDipSwitch
+        (.clock(s_systemClock),
+         .reset(s_cpuReset),
+         .externalInputs(dipSwitch),
+         .externalOutputs(sevenSegments),
+         .beginTransactionIn(s_beginTransaction),
+         .endTransactionIn(s_endTransaction),
+         .readNotWriteIn(s_readNotWrite),
+         .dataValidIn(s_dataValid),
+         .busErrorIn(s_busError),
+         .busyIn(s_busy),
+         .addressDataIn(s_addressData),
+         .byteEnablesIn(s_byteEnables),
+         .burstSizeIn(s_burstSize),
+         .endTransactionOut(sGpioEndTransaction),
+         .dataValidOut(sGpioDataValid),
+         .busErrorOut(sGpioBusError),
+         .addressDataOut(sGpioAddressData));
 
   /*
    *
@@ -672,15 +706,15 @@ module or1420SingleCore ( input wire         clock12MHz,
  assign s_busRequests[31] = s_cpu1DcacheRequestBus;
  assign s_busRequests[30] = s_cpu1IcacheRequestBus;
  assign s_busRequests[29] = s_hdmiRequestBus;
- assign s_busRequests[28] = s_camReqBus;
- assign s_busRequests[27] = s_cidmaRequestBus;
- assign s_busRequests[26:0] = 28'd0;
+ assign s_busRequests[28] =  s_camReqBus;
+ assign s_busRequests[27] = s_ramDmaRequest;
+ assign s_busRequests[26:0] = 27'd0;
  
  assign s_cpu1DcacheBusAccessGranted = s_busGrants[31];
  assign s_cpu1IcacheBusAccessGranted = s_busGrants[30];
  assign s_hdmiBusgranted             = s_busGrants[29];
  assign s_camAckBus                  = s_busGrants[28];
- assign s_cidmaBusgranted            = s_busGrants[27];
+ assign s_ramDmaGranted              = s_busGrants[27];
 
  busArbiter arbiter ( .clock(s_systemClock),
                       .reset(s_reset),
@@ -701,17 +735,18 @@ module or1420SingleCore ( input wire         clock12MHz,
    * Here we define the bus architecture
    *
    */
- assign s_busError         = s_arbBusError | s_biosBusError | s_uartBusError | s_sdramBusError | s_flashBusError;
- assign s_beginTransaction = s_cpu1BeginTransaction | s_hdmiBeginTransaction | s_camBeginTransaction | s_cidmaBeginTransaction;
+ assign s_busError         = s_arbBusError | s_biosBusError | s_uartBusError | s_sdramBusError | s_flashBusError | sGpioBusError;
+ assign s_beginTransaction = s_cpu1BeginTransaction | s_hdmiBeginTransaction | s_camBeginTransaction| s_ramDmaBeginTransaction;
  assign s_endTransaction   = s_cpu1EndTransaction | s_arbEndTransaction | s_biosEndTransaction | s_uartEndTransaction |
-                             s_sdramEndTransaction | s_hdmiEndTransaction | s_flashEndTransaction | s_camEndTransaction | s_cidmaEndTransaction;
+                             s_sdramEndTransaction | s_hdmiEndTransaction | s_flashEndTransaction | s_camEndTransaction |
+                             sGpioEndTransaction | s_ramDmaEndTransaction;
  assign s_addressData      = s_cpu1AddressData | s_biosAddressData | s_uartAddressData | s_sdramAddressData | s_hdmiAddressData |
-                             s_flashAddressData | s_camAddressData | s_cidmaAddressData;
- assign s_byteEnables      = s_cpu1byteEnables | s_hdmiByteEnables | s_camByteEnables | s_cidmaByteEnables;
- assign s_readNotWrite     = s_cpu1ReadNotWrite | s_hdmiReadNotWrite | s_cidmaReadNotWrite;
+                             s_flashAddressData | s_camAddressData | sGpioAddressData | s_ramDmaAddressData;
+ assign s_byteEnables      = s_cpu1byteEnables | s_hdmiByteEnables | s_camByteEnables | s_ramDmaByteEnables;
+ assign s_readNotWrite     = s_cpu1ReadNotWrite | s_hdmiReadNotWrite | s_ramDmaReadNotWrite;
  assign s_dataValid        = s_cpu1DataValid | s_biosDataValid | s_uartDataValid | s_sdramDataValid | s_hdmiDataValid | 
-                             s_flashDataValid | s_camDataValid | s_cidmaDataValid;
+                             s_flashDataValid | s_camDataValid | sGpioDataValid | s_ramDmaDataValid;
  assign s_busy             = s_sdramBusy;
- assign s_burstSize        = s_cpu1BurstSize | s_hdmiBurstSize | s_camBurstSize | s_cidmaBurstSize;
+ assign s_burstSize        = s_cpu1BurstSize | s_hdmiBurstSize | s_camBurstSize | s_ramDmaBurstSize;
  
 endmodule
