@@ -18,7 +18,7 @@ int main()
   const uint32_t blockSize = 3 << 10;
   const uint32_t burstSize = 4 << 10;
   const uint32_t statusControl = 5 << 10;
-  const uint32_t usedCiRamAddress = 50;
+   uint32_t usedCiRamAddress = 0;
   const uint32_t usedBlocksize = 512;
   const uint32_t usedBurstSize = 16;
   volatile uint16_t rgb565[640 * 480];
@@ -65,18 +65,18 @@ int main()
     // initialize the buffer
     // give ramdmacontroller the address of the buffer
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress1));
-    asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(0));
+    asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(blockSize | writeBit), [in2] "r"(usedBlocksize));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(burstSize | writeBit), [in2] "r"(usedBurstSize));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
 
     for (int i = 1; i < 600; i++)
     {
-      currentAddress1 = (currentAddress1 == address1) ? address2 : address1;
-      currentAddress2 = (currentAddress2 == address1) ? address2 : address1;
-
+      
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress1));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress+256));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress2));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
 

@@ -15,12 +15,13 @@
 ../../../modules/spi/verilog/spiBus.v
 ../../../modules/i2c/verilog/i2cMaster.v
 ../../../modules/i2c/verilog/i2cCustomInstr.v
-../../../modules/ramDmaCi/dualPortSSRAM.v
-../../../modules/ramDmaCi/ramDmaCi.v
 ../../../modules/profileCi/verilog/counter.v
 ../../../modules/profileCi/verilog/profileCi.v
 ../../../modules/grayscaleCi/verilog/rgb565Grayscale.v
 ../../../modules/grayscaleCi/verilog/rgb565ISE.v
+../../../modules/gpio/verilog/gpio.v
+../../../modules/ramDmaCi/verilog/dualPortSSram.v
+../../../modules/ramDmaCi/verilog/ramDmaCi.v
 ../../../modules/camera/verilog/camera.v
 ../../../modules/delay/verilog/delayIse.v
 ../../../modules/swapbyteIse/verilog/swapByteIse.v
