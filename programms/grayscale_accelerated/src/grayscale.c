@@ -19,7 +19,7 @@ int main()
   const uint32_t burstSize = 4 << 10;
   const uint32_t statusControl = 5 << 10;
    uint32_t usedCiRamAddress = 0;
-  const uint32_t usedBlocksize = 512;
+  const uint32_t usedBlocksize = 256;
   const uint32_t usedBurstSize = 16;
   volatile uint16_t rgb565[640 * 480];
   volatile uint8_t grayscale[640 * 480];
@@ -71,7 +71,7 @@ int main()
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(blockSize | writeBit), [in2] "r"(usedBlocksize));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(burstSize | writeBit), [in2] "r"(usedBurstSize));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
-    for (int i = 0; i < 599; i++)
+    for (int i = 1; i < 600; i++)
     {
       currentStat = i%2;
       currentAddress = (currentStat == 0) ? address1 : address2;
@@ -82,13 +82,15 @@ int main()
 
 
        //write dma to buffer1 or buffer2
-       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)currentAddress));
+       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)grayscale[(i-1)*512]));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress + ((i+1)%2) * 256));
        asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
-
-
-
     }
+
+    asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)grayscale[640 * 480-600]));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress + currentStat * 256));
+       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
+
     asm volatile("l.nios_rrr %[out1],r0,%[in2],0xC" : [out1] "=r"(cycles) : [in2] "r"(1 << 8 | 7 << 4));
     asm volatile("l.nios_rrr %[out1],%[in1],%[in2],0xC" : [out1] "=r"(stall) : [in1] "r"(1), [in2] "r"(1 << 9));
     asm volatile("l.nios_rrr %[out1],%[in1],%[in2],0xC" : [out1] "=r"(idle) : [in1] "r"(2), [in2] "r"(1 << 10));

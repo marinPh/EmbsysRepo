@@ -85,6 +85,8 @@ module ramDmaCi #( parameter [7:0] customId = 8'h00 )
   reg [8:0] s_ramCiAddressReg;
   wire s_ramCiWriteEnable;
   wire [31:0] s_busRamData;
+
+ rgb565GrayscaleIse()
   
   dualPortSSRAM #( .bitwidth(32),
                    .nrOfEntries(512)) memory
