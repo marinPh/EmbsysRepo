@@ -22,16 +22,11 @@ The accelerated version, however, has 17 instructions less, those arithmetic and
 Assuming 1 instruction per cycle it saves 17 * 640 * 480 = 5222400 fetches, decodes and executes. Comparing the numbers above 30.6 M - 24.5 M is indeed around 5 M. The stalled count didn't drop that much because adds and shifts execute in 1CC, and the bus is idle when the CPU does math (it does not read any data from DRAM or camera), and the same 5M CC difference is observed.
 
 
+As6: 
 
-
-
-
-
-
-
-
-
-
+- Task1:
+For task 1 we are down to arounf 3 million elapsed cycles,850 thousands CPU stall cylces and bet 150 to 900 thousand busIdle cylces. This can be explained by the ability to use bursts of 512 pixels and instead of 16 bits read one by one. Here is our prints from our profiling. We can also take in acount that we are converting 4 pixels at ounce in graycale Module allowinf to divide 4 again the the execution time. 
+ ![alt text](./assets/profiling6_1.jpg)
 
 
 
