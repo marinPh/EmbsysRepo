@@ -175,12 +175,21 @@ module camera #(parameter [7:0] customInstructionId = 8'd0,
       s_byte1Reg <= (s_pixelCountReg[1:0] == 2'b10 && hsync == 1'b1) ? camData : s_byte1Reg;
     end
   
+  wire [31:0] temp, s_grayscalePixelWord;
+  wire [7:0] grayscale_p1, grayscale_p2;
+
+  rgb565Grayscale pixel1 ( .rgb565(s_pixelWord[15:0]),
+                           .grayscale(grayscale_p1));
+  rgb565Grayscale pixel2 ( .rgb565(s_pixelWord[31:16]),
+                           .grayscale(grayscale_p2));
+  assign s_grayscalePixelWord = {grayscale_p2[7:3], grayscale_p2[7:2], grayscale_p2[7:3], grayscale_p1[7:3], grayscale_p1[7:2], grayscale_p1[7:3]};
+  
   dualPortRam2k lineBuffer ( .address1(s_pixelCountReg[10:2]),
                              .address2(s_busSelectReg),
                              .clock1(pclk),
                              .clock2(clock),
                              .writeEnable(s_weLineBuffer),
-                             .dataIn1(s_pixelWord),
+                             .dataIn1(s_grayscalePixelWord),
                              .dataOut2(s_busPixelWord));
 
   /*
