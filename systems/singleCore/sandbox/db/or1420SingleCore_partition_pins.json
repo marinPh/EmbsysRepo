@@ -124,6 +124,102 @@
 					"strict" : false
 				},
 				{
+					"name" : "sevenSegments[0]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[1]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[2]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[3]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[4]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[5]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[6]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[7]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[8]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[9]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[10]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[11]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[12]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[13]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[14]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[15]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[16]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[17]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[18]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[19]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[20]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[21]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[22]",
+					"strict" : false
+				},
+				{
+					"name" : "sevenSegments[23]",
+					"strict" : false
+				},
+				{
 					"name" : "hdmiRed[0]",
 					"strict" : false
 				},
@@ -272,7 +368,35 @@
 					"strict" : false
 				},
 				{
-					"name" : "biosBypass",
+					"name" : "dipSwitch[0]",
+					"strict" : false
+				},
+				{
+					"name" : "dipSwitch[1]",
+					"strict" : false
+				},
+				{
+					"name" : "dipSwitch[2]",
+					"strict" : false
+				},
+				{
+					"name" : "dipSwitch[3]",
+					"strict" : false
+				},
+				{
+					"name" : "dipSwitch[4]",
+					"strict" : false
+				},
+				{
+					"name" : "dipSwitch[5]",
+					"strict" : false
+				},
+				{
+					"name" : "dipSwitch[6]",
+					"strict" : false
+				},
+				{
+					"name" : "dipSwitch[7]",
 					"strict" : false
 				},
 				{
@@ -280,11 +404,11 @@
 					"strict" : false
 				},
 				{
-					"name" : "camHsync",
+					"name" : "biosBypass",
 					"strict" : false
 				},
 				{
-					"name" : "camData[1]",
+					"name" : "camHsync",
 					"strict" : false
 				},
 				{
@@ -292,7 +416,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "camData[4]",
+					"name" : "camData[1]",
 					"strict" : false
 				},
 				{
@@ -300,7 +424,15 @@
 					"strict" : false
 				},
 				{
-					"name" : "camVsync",
+					"name" : "camData[3]",
+					"strict" : false
+				},
+				{
+					"name" : "camData[4]",
+					"strict" : false
+				},
+				{
+					"name" : "camData[5]",
 					"strict" : false
 				},
 				{
@@ -312,11 +444,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "camData[3]",
-					"strict" : false
-				},
-				{
-					"name" : "camData[5]",
+					"name" : "camVsync",
 					"strict" : false
 				},
 				{

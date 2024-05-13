@@ -86,7 +86,7 @@ module ramDmaCi #( parameter [7:0] customId = 8'h00 )
   wire s_ramCiWriteEnable;
   wire [31:0] s_busRamData;
 
- rgb565GrayscaleIse()
+ //rgb565GrayscaleIse()
   
   dualPortSSRAM #( .bitwidth(32),
                    .nrOfEntries(512)) memory
@@ -149,7 +149,7 @@ module ramDmaCi #( parameter [7:0] customId = 8'h00 )
     begin
       s_dmaCurrentStateReg <= (reset == 1'b1) ? IDLE : s_dmaNextState;
       s_busErrorReg        <= (reset == 1'b1 || s_dmaCurrentStateReg == INIT) ? 1'b0 :
-                              (s_dmaCurrentStateReg == WAIT_END || s_dmaCurrentStateReg = END_TRANSACTION_ERROR) ? 1'b1 : s_busErrorReg;
+                              (s_dmaCurrentStateReg == WAIT_END || s_dmaCurrentStateReg == END_TRANSACTION_ERROR) ? 1'b1 : s_busErrorReg;
       s_isReadBurstReg     <= (s_dmaCurrentStateReg == IDLE) ? s_requestDmaIn : s_isReadBurstReg;
     end
 
