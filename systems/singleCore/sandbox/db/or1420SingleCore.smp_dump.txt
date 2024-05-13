@@ -140,6 +140,18 @@ s_stateMachineReg.DO_BURST1 0 0 1 0 0 1
 s_stateMachineReg.END_TRANS1 0 1 0 0 0 1 
 s_stateMachineReg.END_TRANS2 1 0 0 0 0 1 
 
+State Machine - |or1420SingleCore|ramDmaCi:ramDma|s_dmaCurrentStateReg
+Name s_dmaCurrentStateReg.END_TRANSACTION_ERROR s_dmaCurrentStateReg.DO_WRITE s_dmaCurrentStateReg.WAIT_END s_dmaCurrentStateReg.DO_READ s_dmaCurrentStateReg.SET_UP_TRANSACTION s_dmaCurrentStateReg.REQUEST_BUS s_dmaCurrentStateReg.INIT s_dmaCurrentStateReg.IDLE s_dmaCurrentStateReg.END_WRITE_TRANSACTION 
+s_dmaCurrentStateReg.IDLE 0 0 0 0 0 0 0 0 0 
+s_dmaCurrentStateReg.INIT 0 0 0 0 0 0 1 1 0 
+s_dmaCurrentStateReg.REQUEST_BUS 0 0 0 0 0 1 0 1 0 
+s_dmaCurrentStateReg.SET_UP_TRANSACTION 0 0 0 0 1 0 0 1 0 
+s_dmaCurrentStateReg.DO_READ 0 0 0 1 0 0 0 1 0 
+s_dmaCurrentStateReg.WAIT_END 0 0 1 0 0 0 0 1 0 
+s_dmaCurrentStateReg.DO_WRITE 0 1 0 0 0 0 0 1 0 
+s_dmaCurrentStateReg.END_TRANSACTION_ERROR 1 0 0 0 0 0 0 1 0 
+s_dmaCurrentStateReg.END_WRITE_TRANSACTION 0 0 0 0 0 0 0 1 1 
+
 State Machine - |or1420SingleCore|i2cCustomInstr:i2cm|i2cMaster:master|s_stateMachineReg
 Name s_stateMachineReg.DIR s_stateMachineReg.ACK3 s_stateMachineReg.D0 s_stateMachineReg.D1 s_stateMachineReg.D2 s_stateMachineReg.D3 s_stateMachineReg.D4 s_stateMachineReg.D5 s_stateMachineReg.D6 s_stateMachineReg.D7 s_stateMachineReg.ACK2 s_stateMachineReg.R0 s_stateMachineReg.R1 s_stateMachineReg.R2 s_stateMachineReg.R3 s_stateMachineReg.R4 s_stateMachineReg.R5 s_stateMachineReg.R6 s_stateMachineReg.R7 s_stateMachineReg.SENDSTOP s_stateMachineReg.ACK1 s_stateMachineReg.A0 s_stateMachineReg.A1 s_stateMachineReg.A2 s_stateMachineReg.A3 s_stateMachineReg.A4 s_stateMachineReg.A5 s_stateMachineReg.A6 s_stateMachineReg.SENDSTART s_stateMachineReg.IDLE 
 s_stateMachineReg.IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 

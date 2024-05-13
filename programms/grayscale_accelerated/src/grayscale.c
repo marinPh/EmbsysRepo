@@ -36,7 +36,6 @@ int main()
 
   int32_t valueA = 0;
   int32_t valueB = 0;
-  int32_t result = 0;
 
   // init ram
   for (int i = 0; i < 512; i++)
@@ -46,7 +45,7 @@ int main()
     buffer2[i] = 0;
   }
 
-  printf("Initialising camera (this takes up to 3 seconds)!\n");
+  printf("I AM THE STORM THAT IS APPROACHING! Initialising camera (this takes up to 3 seconds)!\n");
   camParams = initOv7670(VGA);
   printf("Done!\n");
   printf("NrOfPixels : %d\n", camParams.nrOfPixelsPerLine);
@@ -77,6 +76,7 @@ int main()
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
     for (int i = 1; i < 600; i++)
     {
+      printf("batch %d\n", i);
       for(int j = 0; j < 256; j+=2)
       {
         valueB = buffer1[j];
@@ -114,6 +114,6 @@ int main()
     asm volatile("l.nios_rrr %[out1],r0,%[in2],0xC" : [out1] "=r"(cycles) : [in2] "r"(1 << 8 | 7 << 4));
     asm volatile("l.nios_rrr %[out1],%[in1],%[in2],0xC" : [out1] "=r"(stall) : [in1] "r"(1), [in2] "r"(1 << 9));
     asm volatile("l.nios_rrr %[out1],%[in1],%[in2],0xC" : [out1] "=r"(idle) : [in1] "r"(2), [in2] "r"(1 << 10));
-    printf("nrOfCycles: %d %d %d\n", cycles, stall, idle);
+    printf("aduhdaydgwauysgfuaygduawgduy: %d %d %d\n", cycles, stall, idle);
   }
 }
