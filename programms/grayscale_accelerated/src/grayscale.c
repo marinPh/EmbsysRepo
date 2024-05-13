@@ -27,12 +27,16 @@ int main()
   volatile unsigned int *vga = (unsigned int *)0X50000020;
   camParameters camParams;
   vga_clear();
-  int8_t buffer1[512];
-  int8_t buffer2[512];
+  int32_t buffer1[512];
+  int32_t buffer2[512];
 
-  int8_t *address1 = (int8_t *)&buffer1[0];
-  int8_t *address2 = (int8_t *)&buffer2[0];
-  int8_t *currentAddress = address1;
+  int32_t *address1 = (int32_t *)&buffer1[0];
+  int32_t *address2 = (int32_t *)&buffer2[0];
+  int32_t *currentAddress = address1;
+
+  int32_t valueA = 0;
+  int32_t valueB = 0;
+  int32_t result = 0;
 
   // init ram
   for (int i = 0; i < 512; i++)
@@ -73,18 +77,33 @@ int main()
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
     for (int i = 1; i < 600; i++)
     {
-      currentStat = i%2;
-      currentAddress = (currentStat == 0) ? address1 : address2;
-      // write rgb565[i*512] to dma 
-      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)rgb565 [i * 512]));
-      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress + currentStat * 256));
-       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
+      for(int j = 0; j < 256; j+=2)
+      {
+        valueB = buffer1[j];
+        valueA = buffer1[j+1];
+       asm volatile ("l.nios_rrr %[out1],%[in1],%[in2],0x9":[out1]"=r"(result):[in1]"r"(valueB),[in2]"r"(valueA));
+       buffer1[j] = result;
+      }
+      //we transfer from rgb to buffer via ramdmacontroller
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t) &rgb565[i*512])); 
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress));
+     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
 
+     //we transfer from dma to buffer via ramdmacontroller
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t) buffer1)); 
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
 
-       //write dma to buffer1 or buffer2
-       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)grayscale[(i-1)*512]));
-      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress + ((i+1)%2) * 256));
-       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
+      
+
+      //we transfer from rgb to buffer via ramdmacontroller
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t) &buffer1[0])); 
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress + 256));
+     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
+
+     //we transfer from dma to buffer via ramdmacontroller
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t) grayscale[i*512])); 
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
+
     }
 
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)grayscale[640 * 480-600]));
