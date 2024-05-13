@@ -25,6 +25,7 @@ Assuming 1 instruction per cycle it saves 17 * 640 * 480 = 5222400 fetches, deco
 As6: 
 
 - Task1:
+We are using the program folder programms/grayscale_accelerated.
 For task 1 we are down to arounf 3 million elapsed cycles,850 thousands CPU stall cylces and bet 150 to 900 thousand busIdle cylces. This can be explained by the ability to use bursts of 512 pixels and instead of 16 bits read one by one. Here is our prints from our profiling. We can also take in acount that we are converting 4 pixels at ounce in graycale Module allowinf to divide 4 again the the execution time. 
  ![alt text](./assets/profiling6_1.jpg)
 
