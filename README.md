@@ -9,31 +9,25 @@ As2: A new executable was created under .programs/grayscale_accelerated to use t
 As3: The elapsed cycles dropped to 24.5 M, 18.3 M stalled and for 11.5 M the bus was idle.
 
 As4: You can see a comparison below:
-![alt text](./assets/cc.png)
+![alt text](assets/cc.png)
 
 The camera takes pictures with a resolution of 640 * 480 = 307200 pixels, and the program processes each of them inside 2 nested loops, the outer for line, the inner for column.
 
 Disassembling the original program we can see the inner loop executing 33 instructions, most of them adds and shifts.
-![alt text](./assets/original_cfg.png)
+![alt text](assets/original_cfg.png)
 
 The accelerated version, however, has 17 instructions less, those arithmetic and logic needed to convert to grayscale.
-![alt text](./assets/accelerated_cfg.png)
+![alt text](assets/accelerated_cfg.png)
 
 Assuming 1 instruction per cycle it saves 17 * 640 * 480 = 5222400 fetches, decodes and executes. Comparing the numbers above 30.6 M - 24.5 M is indeed around 5 M. The stalled count didn't drop that much because adds and shifts execute in 1CC, and the bus is idle when the CPU does math (it does not read any data from DRAM or camera), and the same 5M CC difference is observed.
 
 
+As6:
 
-
-
-
-
-
-
-
-
-
-
-
+- Task1:
+We are using the program folder programms/grayscale_accelerated.
+For task 1 we are down to arounf 3 million elapsed cycles,850 thousands CPU stall cylces and bet 150 to 900 thousand busIdle cylces. This can be explained by the ability to use bursts of 512 pixels and instead of 16 bits read one by one. Here is our prints from our profiling. We can also take in acount that we are converting 4 pixels at ounce in graycale Module allowinf to divide 4 again the the execution time.
+ ![alt text](./assets/profiling6_1.jpg)
 
 =========================OLD README BELOW=============================
 #### Structure:
