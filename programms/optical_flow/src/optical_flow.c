@@ -57,7 +57,7 @@ void compute_gradients(uint8_t I1[640 * 480], float Ix[640 * 480], float Iy[640 
 }
 
 // Function to calculate optical flow using Lucas-Kanade method
-void lucas_kanade(uint8_t I1[640 * 480], uint8_t I2[640 * 480], uint8_t U[640 * 480], uint8_t V[640 * 480])
+void lucas_kanade(uint8_t I1[640 * 480], uint8_t I2[640 * 480], uint16_t UV[640 * 480])
 {
 #define WINDOW_SIZE 5
   float Ix[640 * 480], Iy[640 * 480], It[640 * 480];
@@ -94,13 +94,11 @@ void lucas_kanade(uint8_t I1[640 * 480], uint8_t I2[640 * 480], uint8_t U[640 * 
       float denom = sum_Ix2 * sum_Iy2 - sum_IxIy * sum_IxIy;
       if (denom != 0)
       {
-        U[x + y * 640] = (sum_Iy2 * sum_IxIt - sum_IxIy * sum_IyIt) / denom;
-        V[x + y * 640] = (sum_Ix2 * sum_IyIt - sum_IxIy * sum_IxIt) / denom;
+        UV[x + y * 640] = (sum_Iy2 * sum_IxIt - sum_IxIy * sum_IyIt) / denom +  ((sum_Ix2 * sum_IyIt - sum_IxIy * sum_IxIt) / denom)*(1<<8);
       }
       else
       {
-        U[x + y * 640] = 0;
-        V[x + y * 640] = 0;
+        UV[x + y * 640] = 0;
       }
     }
   }
@@ -111,6 +109,7 @@ int main()
   volatile uint16_t rgb565[640 * 480];
   volatile uint8_t grayscale[640 * 480];
   volatile uint16_t opticalFlow[640 * 480];
+  volatile uint8_t oldGray[640 * 480];
   volatile uint32_t result, cycles, stall, idle;
   volatile unsigned int *vga = (unsigned int *)0X50000020;
   camParameters camParams;
@@ -140,7 +139,6 @@ int main()
     uint32_t *flow = (uint32_t *)&opticalFlow[0];
     takeSingleImageBlocking((uint32_t)&rgb565[0]);
     asm volatile("l.nios_rrr r0,r0,%[in2],0xC" ::[in2] "r"(7));
-
     // start the first transfer
     // we transfer from rgb to buffer via ramdmacontroller
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"(rgb));
@@ -148,7 +146,6 @@ int main()
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(burstSize | writeBit), [in2] "r"(usedBurstSize));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress[0]));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
-
     // poll until dma transfer
     int32_t dma_status = 1;
     while (dma_status & 1)
@@ -157,16 +154,6 @@ int main()
     }
 
     // printf("[+]First transfer completed!\n");
-
-    for (int pixel = 0; pixel < 256; pixel += 2)
-    {
-      uint32_t pixels12 = 0;
-      uint32_t pixels34 = 0;
-      asm volatile("l.nios_rrr %[out1],%[in1],r0,20" : [out1] "=r"(pixels12) : [in1] "r"(usedCiRamAddress[0] + pixel));
-      asm volatile("l.nios_rrr %[out1],%[in1],r0,20" : [out1] "=r"(pixels34) : [in1] "r"(usedCiRamAddress[0] + pixel + 1));
-      printf("Pixel%d: 0x%x (expected 0x%x)\n", pixel, pixels12, rgb[pixel]);
-      printf("Pixel%d: 0x%x (expected 0x%x)\n", pixel + 1, pixels34, rgb[pixel + 1]);
-    }
     // return 0;
 
     int ping = 0; // where are we converting to grayscale
@@ -185,7 +172,6 @@ int main()
       convert(usedCiRamAddress[ping]);
 
       // printf(" * Conversion completed!\n");
-
       // we transfer from dma to gray buffer via ramdmacontroller
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(blockSize | writeBit), [in2] "r"(BlocksizeGray));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)&grayscale[(i - 1) * 512]));
@@ -202,7 +188,6 @@ int main()
       ping = ping ^ 1;
       pong = pong ^ 1;
     }
-
     // last batch, we do not start another transfer
     convert(usedCiRamAddress[ping]);
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)grayscale[600 * 256]));
@@ -214,6 +199,15 @@ int main()
     {
       asm volatile("l.nios_rrr %[out1],%[in1],r0,20" : [out1] "=r"(dma_status) : [in1] "r"(statusControl));
     }
+
+    // get gradients
+
+    lucas_kanade(oldGray, grayscale, (uint16_t *)&opticalFlow[0]); 
+    // swap buffers
+
+    // TODO: implement swap with DMA
+
+    
 
     //
 
