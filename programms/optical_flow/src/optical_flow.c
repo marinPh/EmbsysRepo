@@ -47,8 +47,13 @@ void compute_gradients(uint8_t I1[640 * 480], float Ix[640 * 480], float Iy[640 
       }
       else
       {
-        Ix[x + 640 * y] = (I1[x + 640 * y + 1] - I1[x + 640 * y - 1]) / 2.0;
-        Iy[x + 640 * y] = (I1[x + 640 * (y + 1)] - I1[x + 640 * (y - 1)]) / 2.0;
+        float tempx = (I1[x + 640 * y + 1] - I1[x + 640 * y - 1]);
+        float tempy = (I1[x + 640 * (y + 1)] - I1[x + 640 * (y - 1)]);
+
+        Ix[x + 640 * y] = tempx * 0.5;
+        Iy[x + 640 * y] = tempy * 0.5;
+
+        // minus 1 to the exponent to divide by 2
       }
 
       It[x + 640 * y] = I2[x + 640 * y] - I1[x + 640 * y];
@@ -94,7 +99,7 @@ void lucas_kanade(uint8_t I1[640 * 480], uint8_t I2[640 * 480], uint16_t UV[640 
       float denom = sum_Ix2 * sum_Iy2 - sum_IxIy * sum_IxIy;
       if (denom != 0)
       {
-        UV[x + y * 640] = (sum_Iy2 * sum_IxIt - sum_IxIy * sum_IyIt) / denom +  ((sum_Ix2 * sum_IyIt - sum_IxIy * sum_IxIt) / denom)*(1<<8);
+        UV[x + y * 640] = (sum_Iy2 * sum_IxIt - sum_IxIy * sum_IyIt) / denom + ((sum_Ix2 * sum_IyIt - sum_IxIy * sum_IxIt) / denom) * (1 << 8);
       }
       else
       {
@@ -194,7 +199,7 @@ int main()
       asm volatile("l.nios_rrr %[out1],%[in1],r0,20" : [out1] "=r"(dma_status) : [in1] "r"(statusControl));
     }
     // get gradients
-    lucas_kanade(oldGray, grayscale, (uint16_t *)&opticalFlow[0]); 
+    lucas_kanade(oldGray, grayscale, (uint16_t *)&opticalFlow[0]);
     // swap buffers
     uint32_t *temp = old;
     old = gray;
