@@ -137,6 +137,7 @@ int main()
     uint32_t *rgb = (uint32_t *)&rgb565[0];
     uint32_t *gray = (uint32_t *)&grayscale[0];
     uint32_t *flow = (uint32_t *)&opticalFlow[0];
+    uint32_t *old = (uint32_t *)&oldGray[0];
     takeSingleImageBlocking((uint32_t)&rgb565[0]);
     asm volatile("l.nios_rrr r0,r0,%[in2],0xC" ::[in2] "r"(7));
     // start the first transfer
@@ -152,10 +153,8 @@ int main()
     {
       asm volatile("l.nios_rrr %[out1],%[in1],r0,20" : [out1] "=r"(dma_status) : [in1] "r"(statusControl));
     }
-
     // printf("[+]First transfer completed!\n");
     // return 0;
-
     int ping = 0; // where are we converting to grayscale
     int pong = 1; // where we transfer the next line
     for (int i = 1; i <= 600; i++)
@@ -164,53 +163,42 @@ int main()
       // printf("[+]Iteration %d\n", i);
       // start next transfer
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(blockSize | writeBit), [in2] "r"(Blocksize565));
-      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)&rgb565[i * 512]));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)(rgb + i * 256)));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress[pong]));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(1));
-
       // printf("batch %d\n", i);
       convert(usedCiRamAddress[ping]);
-
       // printf(" * Conversion completed!\n");
       // we transfer from dma to gray buffer via ramdmacontroller
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(blockSize | writeBit), [in2] "r"(BlocksizeGray));
-      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)&grayscale[(i - 1) * 512]));
+      asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)(gray + (i - 1) * 128)));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress[ping]));
       asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
-
       dma_status = 1;
       while (dma_status & 1)
       {
         asm volatile("l.nios_rrr %[out1],%[in1],r0,20" : [out1] "=r"(dma_status) : [in1] "r"(statusControl));
       }
-
       // printf(" * Write-back completed!\n");
       ping = ping ^ 1;
       pong = pong ^ 1;
     }
     // last batch, we do not start another transfer
     convert(usedCiRamAddress[ping]);
-    asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)grayscale[600 * 256]));
+    asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(busStartAddress | writeBit), [in2] "r"((uint32_t)(gray + 600 * 64)));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(memoryStartAddress | writeBit), [in2] "r"(usedCiRamAddress[ping]));
     asm volatile("l.nios_rrr r0,%[in1],%[in2],20" ::[in1] "r"(statusControl | writeBit), [in2] "r"(2));
-
     dma_status = 1;
     while (dma_status & 1)
     {
       asm volatile("l.nios_rrr %[out1],%[in1],r0,20" : [out1] "=r"(dma_status) : [in1] "r"(statusControl));
     }
-
     // get gradients
-
     lucas_kanade(oldGray, grayscale, (uint16_t *)&opticalFlow[0]); 
     // swap buffers
-
-    // TODO: implement swap with DMA
-
-    
-
-    //
-
+    uint32_t *temp = old;
+    old = gray;
+    gray = temp;
     asm volatile("l.nios_rrr %[out1],r0,%[in2],0xC" : [out1] "=r"(cycles) : [in2] "r"(1 << 8 | 7 << 4));
     asm volatile("l.nios_rrr %[out1],%[in1],%[in2],0xC" : [out1] "=r"(stall) : [in1] "r"(1), [in2] "r"(1 << 9));
     asm volatile("l.nios_rrr %[out1],%[in1],%[in2],0xC" : [out1] "=r"(idle) : [in1] "r"(2), [in2] "r"(1 << 10));
