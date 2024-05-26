@@ -133,8 +133,9 @@ int main()
   printf("FPS        : %d\n", camParams.framesPerSecond);
   uint32_t *rgb = (uint32_t *)&rgb565[0];
   uint32_t grayPixels;
+  //TODO: check if we need to swap the bytes of something else than the pixel values
   vga[2] = swap_u32(2);
-  vga[3] = swap_u32((uint32_t)&grayscale[0]);
+  vga[3] = swap_u32((uint32_t)&opticalFlow[0]);
   int currentStat = 1;
 
   while (1)
