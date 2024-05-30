@@ -458,7 +458,6 @@ module or1420SingleCore ( input wire         clock12MHz,
                sobel_mult #(.customId(8'h18)) sobelm
              (.start(s_cpu1CiStart),
               .clock(s_systemClock),
-      
               .valueA(s_cpu1CiDataA),
               .valueB(s_cpu1CiDataB),
               .ciN(s_cpu1CiN),
