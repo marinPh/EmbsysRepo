@@ -315,10 +315,10 @@ module or1420SingleCore ( input wire         clock12MHz,
    * Here we instantiate the CPU
    *
    */
-  wire [31:0] s_cpu1CiResult, s_profileResult, s_grayResult, s_ramDmaResult;
+  wire [31:0] s_cpu1CiResult, s_profileResult, s_grayResult, s_ramDmaResult, s_sobelmResult;
   wire [31:0] s_cpu1CiDataA, s_cpu1CiDataB, s_camCiResult, s_delayResult;
   wire [7:0]  s_cpu1CiN;
-  wire        s_cpu1CiRa, s_cpu1CiRb, s_cpu1CiRc, s_cpu1CiStart, s_cpu1CiCke, s_cpu1CiDone, s_i2cCiDone, s_delayCiDone;
+  wire        s_cpu1CiRa, s_cpu1CiRb, s_cpu1CiRc, s_cpu1CiStart, s_cpu1CiCke, s_cpu1CiDone, s_i2cCiDone, s_delayCiDone,s_sobelmDone;
   wire [4:0]  s_cpu1CiA, s_cpu1CiB, s_cpu1CiC;
   wire        s_cpu1IcacheRequestBus, s_cpu1DcacheRequestBus, s_camCiDone, s_ramDmaDone;
   wire        s_cpu1IcacheBusAccessGranted, s_cpu1DcacheBusAccessGranted;
@@ -454,6 +454,18 @@ module or1420SingleCore ( input wire         clock12MHz,
               .ciN(s_cpu1CiN),
               .done(s_profileDone),
               .result(s_profileResult) );
+
+               sobel_mult #(.customId(8'h18)) sobelm
+             (.start(s_cpu1CiStart),
+              .clock(s_systemClock),
+      
+              .valueA(s_cpu1CiDataA),
+              .valueB(s_cpu1CiDataB),
+              .ciN(s_cpu1CiN),
+              .done(s_sobelmDone),
+              .result(s_sobelmResult) );
+
+
 
   /*
    *
