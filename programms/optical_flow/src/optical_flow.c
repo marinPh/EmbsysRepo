@@ -47,6 +47,7 @@ void compute_gradients(uint8_t I1[640 * 480], float Ix[640 * 480], float Iy[640 
       }
       else
       {
+    
         float tempx = (I1[x + 640 * y + 1] - I1[x + 640 * y - 1]);
         float tempy = (I1[x + 640 * (y + 1)] - I1[x + 640 * (y - 1)]);
 
