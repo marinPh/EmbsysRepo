@@ -412,15 +412,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "camData[0]",
-					"strict" : false
-				},
-				{
-					"name" : "camData[1]",
-					"strict" : false
-				},
-				{
-					"name" : "camData[2]",
+					"name" : "camData[4]",
 					"strict" : false
 				},
 				{
@@ -428,11 +420,19 @@
 					"strict" : false
 				},
 				{
-					"name" : "camData[4]",
+					"name" : "camData[2]",
 					"strict" : false
 				},
 				{
-					"name" : "camData[5]",
+					"name" : "camData[1]",
+					"strict" : false
+				},
+				{
+					"name" : "camData[0]",
+					"strict" : false
+				},
+				{
+					"name" : "camData[7]",
 					"strict" : false
 				},
 				{
@@ -440,7 +440,7 @@
 					"strict" : false
 				},
 				{
-					"name" : "camData[7]",
+					"name" : "camData[5]",
 					"strict" : false
 				},
 				{

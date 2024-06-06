@@ -1,4 +1,4 @@
-PROJECT = grayscale_accelerated
+PROJECT = motion_detect
 
 # please refer to the followings for more information:
 #   https://stackoverflow.com/a/30142139/2604712
